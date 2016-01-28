@@ -24,6 +24,9 @@ class GeneSignatureController {
     def springSecurityService
     def i2b2HelperService
 
+    private static final String GENERIC_OTHER_BIO_CONCEPT_CODE = 'OTHER'
+    private static final String GENERIC_OTHER_CODE_TYPE_NAME = 'OTHER'
+
     // concept code categories
     static def SOURCE_CATEGORY = "GENE_SIG_SOURCE"
     static def OWNER_CATEGORY = "GENE_SIG_OWNER"
@@ -832,19 +835,25 @@ class GeneSignatureController {
 
             case 3:
                 // 'other' concept code item
-                def otherConceptItem = ConceptCode.get(1)
+                //def otherConceptItem = ConceptCode.get(1)
+                def otherConceptItem = ConceptCode.findByBioConceptCodeAndCodeTypeName(
+                   GENERIC_OTHER_BIO_CONCEPT_CODE,
+                   GENERIC_OTHER_CODE_TYPE_NAME)
 
                 // normalization methods
                 wizard.normMethods = ConceptCode.findAllByCodeTypeName(NORM_METHOD_CATEGORY, [sort: "bioConceptCode"])
-                wizard.normMethods.add(otherConceptItem);
+                if (otherConceptItem != null)
+                    wizard.normMethods.add(otherConceptItem);
 
                 // analytic categories
                 wizard.analyticTypes = ConceptCode.findAllByCodeTypeName(ANALYTIC_TYPE_CATEGORY, [sort: "bioConceptCode"])
-                wizard.analyticTypes.add(otherConceptItem)
+                if (otherConceptItem != null)
+                    wizard.analyticTypes.add(otherConceptItem)
 
                 // analysis methods
                 wizard.analysisMethods = ConceptCode.findAllByCodeTypeName(ANALYSIS_METHOD_CATEGORY, [sort: "bioConceptCode"])
-                wizard.analysisMethods.add(otherConceptItem);
+                if (otherConceptItem != null)
+                    wizard.analysisMethods.add(otherConceptItem);
 
                 // file schemas
                 wizard.schemas = GeneSignatureFileSchema.findAllBySupported(true, [sort: "name"])
