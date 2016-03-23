@@ -1,11 +1,14 @@
 package com.recomdata.dataexport.util
 
+import groovy.transform.CompileStatic
 import org.apache.commons.lang.StringUtils;
 
 class ExportUtil {
 
+//    @CompileStatic
     public static String getShortConceptPath(String conceptPath, removalArr) {
-        def arr = StringUtils.split(conceptPath, "\\")
+//        def arr = StringUtils.split(conceptPath, "\\")
+        def arr = StringUtils.split(conceptPath, '\\')
         def valList = []
         //Remove upto Study-name and any string values specified in the removalArr
         if (arr.length > 2) arr.eachWithIndex { val, i ->

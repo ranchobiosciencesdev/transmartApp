@@ -31,10 +31,15 @@ public class FileWriterUtil {
     private static org.apache.log4j.Logger log = Logger
             .getLogger(FileWriterUtil.class);
 
+
     /**
      * Maximum loop count when creating temp directories.
      */
     private final int TEMP_DIR_ATTEMPTS = 10000;
+
+    public File getOutputFile() {
+        return outputFile;
+    }
 
     /**
      * Atomically creates a new directory somewhere beneath the system's

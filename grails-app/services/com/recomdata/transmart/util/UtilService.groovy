@@ -1,8 +1,12 @@
 package com.recomdata.transmart.util
 
+import groovy.transform.CompileStatic
+
+
 class UtilService {
 
     boolean transactional = false
+
 
     def toListString(List<Object> objList) {
         StringBuilder objToString = new StringBuilder()
