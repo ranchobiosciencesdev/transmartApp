@@ -1,7 +1,12 @@
 package com.recomdata.transmart.data.export.util
+
+import groovy.transform.CompileStatic
+
 /**
  * This is helper class for converting clinical pivot data.
  */
+
+@CompileStatic
 public class ClinicalPivotDataConverter {
     private final String inputFileLoc;
     private final String study;
@@ -22,6 +27,7 @@ public class ClinicalPivotDataConverter {
         this.deleteFlag = deleteFlag;
         this.snpDataExists = snpDataExists;
     }
+
 
     private void readMatrix() throws IOException {
         File baseFile = new File(inputFileLoc);

@@ -1,7 +1,12 @@
 package com.recomdata.transmart.data.export.util
+
+import groovy.transform.CompileStatic
+
 /**
  * This is helper class for converting clinical MRNA pivot data.
  */
+
+@CompileStatic
 public class ClinicalMRNAPivotDataConverter {
     private final String inputFileLoc;
     private final String study;
