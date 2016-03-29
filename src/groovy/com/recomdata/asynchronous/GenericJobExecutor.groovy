@@ -84,35 +84,7 @@ class GenericJobExecutor implements Job {
         }
     }
 
-    def static calculateAndWriteToFileMethodsWokingTime(long startTime, long endTime, String methodName) {
-        def directory = '/home/sergey/Downloads'
-        def folderName = 'transmartMethodsWorkingTime'
-        def fileInfo = []
-        Random rand = new Random()
-        int max = 1000
-        def randNumber = rand.nextInt(max+1)
-
-        File file
-
-        new File(directory + '/' + folderName).mkdir()
-        def fullFilePath = directory + '/' + folderName + '/' + 'GenericJobExecutor' + methodName + randNumber + '.txt'
-
-
-        file = new File(fullFilePath)
-
-        boolean b = file.createNewFile()
-
-        long workingTime = endTime - startTime
-
-        fileInfo << workingTime
-        fileInfo.each {
-            file << ("${it}")
-        }
-
-    }
-
     private void doExecute(JobDetail jobDetail) {
-        long startTime = System.currentTimeMillis()
 
         //Gather the jobs info.
         jobName = jobDetail.getName()
@@ -193,8 +165,6 @@ class GenericJobExecutor implements Job {
         //Marking the status as complete makes the
         updateStatus(jobName, "Completed")
 
-        long endTime = System.currentTimeMillis()
-        calculateAndWriteToFileMethodsWokingTime(startTime, endTime, '_doExecute()')
     }
 
     private boolean isStudySelected(int studyCnt, List checkboxList) {
