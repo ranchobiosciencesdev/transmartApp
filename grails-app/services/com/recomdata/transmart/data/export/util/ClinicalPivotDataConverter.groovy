@@ -1,6 +1,9 @@
 package com.recomdata.transmart.data.export.util
 
 import groovy.transform.CompileStatic
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 /**
  * This is helper class for converting clinical pivot data.
@@ -17,6 +20,9 @@ public class ClinicalPivotDataConverter {
     private Map<String, String> dataFile;
     private Set<String> dataFilePatientIdSet;
     private Set<String> dataFileConceptPathSet;
+
+    CacheManager cm = CacheManager.getInstance();
+    
 
     public ClinicalPivotDataConverter(boolean multipleStudies, String study, String inputFileLoc,
                                       String workingDirectory, boolean deleteFlag, boolean snpDataExists) {
@@ -43,6 +49,9 @@ public class ClinicalPivotDataConverter {
         BufferedReader br = new BufferedReader(fr);
         br.readLine();
 
+        cm.addCache("cache1");
+        Cache cache = cm.getCache("cache1");
+
         while ((s = br.readLine()) != null) {
             buf = s.split("\t");
             buf[0] = buf[0].replace("\"", "");
@@ -51,7 +60,10 @@ public class ClinicalPivotDataConverter {
             if (snpDataExists) {
 
             }
-            dataFile.put(buf[0] + buf[3], buf[4]);
+
+            cache.put(new Element(buf[0] + buf[3], buf[4]));
+
+//            dataFile.put(buf[0] + buf[3], buf[4]);
             dataFileConceptPathSet.add(buf[3]);
             dataFilePatientIdSet.add(buf[0]);
 
@@ -88,7 +100,7 @@ public class ClinicalPivotDataConverter {
                 buf[indexSpn] = buf[indexSpn].replace("\"", "");
                 dataFilePatientIdSet.add(buf[0] + "\t" + buf[indexSpn]);
             }
-            dataFile.put(buf[0] + buf[3], buf[4]);
+            dataFile.put((buf[0] + buf[3]), buf[4]);
             dataFileConceptPathSet.add(buf[3]);
         }
         br.close();
@@ -120,29 +132,82 @@ public class ClinicalPivotDataConverter {
 
     private void pivot(String outputFileName) throws IOException {
 
-        int rowCount = dataFilePatientIdSet.size() + 1;
-        int columnCount = dataFileConceptPathSet.size() + 1;
+//        int rowCount = dataFilePatientIdSet.size() + 1;
+//        int columnCount = dataFileConceptPathSet.size() + 1;
         String[] dataFilePatientIdArray = dataFilePatientIdSet.toArray(new String[dataFilePatientIdSet.size()]);
         String[] dataFileConceptPathArray = dataFileConceptPathSet.toArray(new String[dataFileConceptPathSet.size()]);
         Arrays.sort(dataFilePatientIdArray);
-        String[][] matrix = new String[rowCount][columnCount];
-        matrix[0][0] = "PATIENT ID";
+//        String[][] matrix = new String[rowCount][columnCount];
+//        matrix[0][0] = "PATIENT ID";
 
-        for (int indexRow = 0; indexRow < rowCount; indexRow++) {
-            for (int indexColumn = 0; indexColumn < columnCount; indexColumn++) {
-                if (indexRow == 0 && indexColumn != 0) {
-                    matrix[0][indexColumn] = dataFileConceptPathArray[indexColumn - 1];
-                } else if (indexColumn == 0 && indexRow != 0) {
-                    matrix[indexRow][0] = dataFilePatientIdArray[indexRow - 1];
-                } else if (indexColumn != 0) {
-                    matrix[indexRow][indexColumn] = dataFile.get(
-                            dataFilePatientIdArray[indexRow - 1] + dataFileConceptPathArray[indexColumn - 1]);
-                    if (matrix[indexRow][indexColumn] == null)
-                        matrix[indexRow][indexColumn] = "NA";
-                }
+
+        File f = new File(outputFileName);
+        BufferedWriter writer;
+        f.createNewFile();
+        writer = new BufferedWriter(new FileWriter(outputFileName));
+
+//        for (int indexRow = 0; indexRow < rowCount; indexRow++) {
+//            for (int indexColumn = 0; indexColumn < columnCount; indexColumn++) {
+//                if (indexRow == 0 && indexColumn != 0) {
+//                    matrix[0][indexColumn] = dataFileConceptPathArray[indexColumn - 1];
+//                } else if (indexColumn == 0 && indexRow != 0) {
+//                    matrix[indexRow][0] = dataFilePatientIdArray[indexRow - 1];
+//                } else if (indexColumn != 0) {
+//                    matrix[indexRow][indexColumn] = dataFile.get(
+//                            dataFilePatientIdArray[indexRow - 1] + dataFileConceptPathArray[indexColumn - 1]);
+//                    if (matrix[indexRow][indexColumn] == null)
+//                        matrix[indexRow][indexColumn] = "NA";
+//                }
+//            }
+//        }
+
+        Cache cache = cm.getCache("cache1")
+
+        writer.write("PATIENT ID");
+        writer.write("\t");
+
+        int indexColumn = 0;
+
+        for (String temp : dataFileConceptPathArray) {
+            writer.write(temp);
+            if (indexColumn != dataFileConceptPathArray.length - 1) {
+                writer.write("\t");
+                indexColumn++;
             }
+
         }
-        writeFile(matrix, outputFileName);
+        writer.write("\n")
+
+
+
+        for (String dataFilePatientId : dataFilePatientIdArray) {
+            writer.write(dataFilePatientId);
+            writer.write("\t");
+            indexColumn = 0;
+
+            for (String dataFileConceptPath : dataFileConceptPathArray) {
+                String value
+
+                if (cache.isKeyInCache(dataFilePatientId + dataFileConceptPath)) {
+                    value = cache.get(dataFilePatientId + dataFileConceptPath).getObjectValue().toString();
+                } else {
+                    value = "NA";
+                }
+
+                writer.write(value);
+                indexColumn++;
+                if (indexColumn != dataFileConceptPathArray.length - 1)
+                    writer.write("\t");
+            }
+            writer.write("\n")
+            writer.flush();
+
+        }
+
+        writer.close();
+
+
+//        writeFile(matrix, outputFileName);
     }
 
     private void pivotSpn(String outputFileName) throws IOException {
@@ -173,6 +238,8 @@ public class ClinicalPivotDataConverter {
         }
         writeFile(matrix, outputFileName);
     }
+
+
 
     public void writeFile(String[][] matrix, String outputFileName) throws IOException {
         File f = new File(outputFileName);
