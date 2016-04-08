@@ -1,10 +1,6 @@
 package com.recomdata.transmart.data.export.util
 
 import groovy.transform.CompileStatic
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
 
 /**
  * This is helper class for converting clinical pivot data.
