@@ -125,6 +125,7 @@ public class ClinicalPivotDataConverter {
         String[] dataFilePatientIdArray = dataFilePatientIdSet.toArray(new String[dataFilePatientIdSet.size()]);
         String[] dataFileConceptPathArray = dataFileConceptPathSet.toArray(new String[dataFileConceptPathSet.size()]);
         Arrays.sort(dataFilePatientIdArray);
+        Arrays.sort(dataFileConceptPathSet);
         String[][] matrix = new String[rowCount][columnCount];
         matrix[0][0] = "PATIENT ID";
 
