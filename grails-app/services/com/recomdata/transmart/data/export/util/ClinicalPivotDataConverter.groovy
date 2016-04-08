@@ -5,6 +5,7 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
+
 /**
  * This is helper class for converting clinical pivot data.
  */
@@ -21,8 +22,7 @@ public class ClinicalPivotDataConverter {
     private Set<String> dataFilePatientIdSet;
     private Set<String> dataFileConceptPathSet;
 
-    CacheManager cm = CacheManager.getInstance();
-    
+
 
     public ClinicalPivotDataConverter(boolean multipleStudies, String study, String inputFileLoc,
                                       String workingDirectory, boolean deleteFlag, boolean snpDataExists) {
@@ -49,8 +49,6 @@ public class ClinicalPivotDataConverter {
         BufferedReader br = new BufferedReader(fr);
         br.readLine();
 
-        cm.addCache("cache1");
-        Cache cache = cm.getCache("cache1");
 
         while ((s = br.readLine()) != null) {
             buf = s.split("\t");
@@ -61,7 +59,7 @@ public class ClinicalPivotDataConverter {
 
             }
 
-            cache.put(new Element(buf[0] + buf[3], buf[4]));
+//            cache.put(new Element(buf[0] + buf[3], buf[4]));
 
 //            dataFile.put(buf[0] + buf[3], buf[4]);
             dataFileConceptPathSet.add(buf[3]);
@@ -137,6 +135,7 @@ public class ClinicalPivotDataConverter {
         String[] dataFilePatientIdArray = dataFilePatientIdSet.toArray(new String[dataFilePatientIdSet.size()]);
         String[] dataFileConceptPathArray = dataFileConceptPathSet.toArray(new String[dataFileConceptPathSet.size()]);
         Arrays.sort(dataFilePatientIdArray);
+        Arrays.sort(dataFileConceptPathArray);
 //        String[][] matrix = new String[rowCount][columnCount];
 //        matrix[0][0] = "PATIENT ID";
 
@@ -145,6 +144,12 @@ public class ClinicalPivotDataConverter {
         BufferedWriter writer;
         f.createNewFile();
         writer = new BufferedWriter(new FileWriter(outputFileName));
+
+        File baseFile = new File(inputFileLoc);
+        FileReader fr = new FileReader(baseFile);
+        BufferedReader br = new BufferedReader(fr);
+        br.readLine();
+
 
 //        for (int indexRow = 0; indexRow < rowCount; indexRow++) {
 //            for (int indexColumn = 0; indexColumn < columnCount; indexColumn++) {
@@ -161,11 +166,8 @@ public class ClinicalPivotDataConverter {
 //            }
 //        }
 
-        Cache cache = cm.getCache("cache1")
-
         writer.write("PATIENT ID");
         writer.write("\t");
-
         int indexColumn = 0;
 
         for (String temp : dataFileConceptPathArray) {
@@ -179,6 +181,18 @@ public class ClinicalPivotDataConverter {
         writer.write("\n")
 
 
+        String s;
+        String[] buf;
+
+        if ((s = br.readLine()) != null) {
+            buf = s.split("\t");
+            buf[0] = buf[0].replace("\"", "");
+            buf[3] = buf[3].replace("\"", "");
+            buf[4] = buf[4].replace("\"", "");
+        }
+
+
+
 
         for (String dataFilePatientId : dataFilePatientIdArray) {
             writer.write(dataFilePatientId);
@@ -188,16 +202,30 @@ public class ClinicalPivotDataConverter {
             for (String dataFileConceptPath : dataFileConceptPathArray) {
                 String value
 
-                if (cache.isKeyInCache(dataFilePatientId + dataFileConceptPath)) {
-                    value = cache.get(dataFilePatientId + dataFileConceptPath).getObjectValue().toString();
-                } else {
+                if (s == null) {
                     value = "NA";
                 }
 
+                if (buf[0].equals(dataFilePatientId) && buf[3].equals(dataFileConceptPath)) {
+                    value = buf[4]
+
+                    if ((s = br.readLine()) != null) {
+                        buf = s.split("\t");
+                        buf[0] = buf[0].replace("\"", "");
+                        buf[3] = buf[3].replace("\"", "");
+                        buf[4] = buf[4].replace("\"", "");
+                    }
+
+                } else {
+                    value = "NA"
+                }
+
                 writer.write(value);
-                indexColumn++;
+
                 if (indexColumn != dataFileConceptPathArray.length - 1)
                     writer.write("\t");
+
+                indexColumn++;
             }
             writer.write("\n")
             writer.flush();
@@ -205,7 +233,8 @@ public class ClinicalPivotDataConverter {
         }
 
         writer.close();
-
+        br.close();
+        fr.close();
 
 //        writeFile(matrix, outputFileName);
     }
