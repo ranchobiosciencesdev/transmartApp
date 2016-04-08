@@ -126,15 +126,10 @@ public class ClinicalPivotDataConverter {
 
     private void pivot(String outputFileName) throws IOException {
 
-//        int rowCount = dataFilePatientIdSet.size() + 1;
-//        int columnCount = dataFileConceptPathSet.size() + 1;
         String[] dataFilePatientIdArray = dataFilePatientIdSet.toArray(new String[dataFilePatientIdSet.size()]);
         String[] dataFileConceptPathArray = dataFileConceptPathSet.toArray(new String[dataFileConceptPathSet.size()]);
         Arrays.sort(dataFilePatientIdArray);
         Arrays.sort(dataFileConceptPathArray);
-//        String[][] matrix = new String[rowCount][columnCount];
-//        matrix[0][0] = "PATIENT ID";
-
 
         File f = new File(outputFileName);
         BufferedWriter writer;
@@ -145,22 +140,6 @@ public class ClinicalPivotDataConverter {
         FileReader fr = new FileReader(baseFile);
         BufferedReader br = new BufferedReader(fr);
         br.readLine();
-
-
-//        for (int indexRow = 0; indexRow < rowCount; indexRow++) {
-//            for (int indexColumn = 0; indexColumn < columnCount; indexColumn++) {
-//                if (indexRow == 0 && indexColumn != 0) {
-//                    matrix[0][indexColumn] = dataFileConceptPathArray[indexColumn - 1];
-//                } else if (indexColumn == 0 && indexRow != 0) {
-//                    matrix[indexRow][0] = dataFilePatientIdArray[indexRow - 1];
-//                } else if (indexColumn != 0) {
-//                    matrix[indexRow][indexColumn] = dataFile.get(
-//                            dataFilePatientIdArray[indexRow - 1] + dataFileConceptPathArray[indexColumn - 1]);
-//                    if (matrix[indexRow][indexColumn] == null)
-//                        matrix[indexRow][indexColumn] = "NA";
-//                }
-//            }
-//        }
 
         writer.write("PATIENT ID");
         writer.write("\t");
@@ -188,8 +167,6 @@ public class ClinicalPivotDataConverter {
         }
 
 
-
-
         for (String dataFilePatientId : dataFilePatientIdArray) {
             writer.write(dataFilePatientId);
             writer.write("\t");
@@ -205,12 +182,30 @@ public class ClinicalPivotDataConverter {
                 if (buf[0].equals(dataFilePatientId) && buf[3].equals(dataFileConceptPath)) {
                     value = buf[4]
 
-                    if ((s = br.readLine()) != null) {
-                        buf = s.split("\t");
-                        buf[0] = buf[0].replace("\"", "");
-                        buf[3] = buf[3].replace("\"", "");
-                        buf[4] = buf[4].replace("\"", "");
+//                    if ((s = br.readLine()) != null) {
+//                        buf = s.split("\t");
+//                        buf[0] = buf[0].replace("\"", "");
+//                        buf[3] = buf[3].replace("\"", "");
+//                        buf[4] = buf[4].replace("\"", "");
+//                    }
+
+                    boolean flag = true;
+                    String[] bufTmp;
+
+                    while (flag && ((s = br.readLine()) != null)) {
+                        bufTmp = s.split("\t");\
+                        bufTmp[0] = bufTmp[0].replace("\"", "");
+                        bufTmp[3] = bufTmp[3].replace("\"", "");
+                        bufTmp[4] = bufTmp[4].replace("\"", "");
+
+                        flag = bufTmp[0].equals(buf[0]) && bufTmp[3].equals(buf[3])
+
+                        if (flag) {
+                            value = bufTmp[4]
+                        }
+
                     }
+                    buf = bufTmp
 
                 } else {
                     value = "NA"
@@ -231,8 +226,6 @@ public class ClinicalPivotDataConverter {
         writer.close();
         br.close();
         fr.close();
-
-//        writeFile(matrix, outputFileName);
     }
 
     private void pivotSpn(String outputFileName) throws IOException {
