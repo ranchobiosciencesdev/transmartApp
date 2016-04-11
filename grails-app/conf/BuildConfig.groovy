@@ -1,13 +1,13 @@
 def forkSettingsRun = [
         minMemory: 1536,
-        maxMemory: 4096,
-        maxPerm  : 384,
+        maxMemory: 14336,
+        maxPerm  : 1024,
         debug    : false,
 ]
 def forkSettingsOther = [
         minMemory: 256,
-        maxMemory: 1024,
-        maxPerm  : 384,
+        maxMemory: 4096,
+        maxPerm  : 1024,
         debug    : false,
 ]
 
