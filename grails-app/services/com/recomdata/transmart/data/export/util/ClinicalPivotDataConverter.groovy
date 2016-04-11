@@ -18,8 +18,6 @@ public class ClinicalPivotDataConverter {
     private Set<String> dataFilePatientIdSet;
     private Set<String> dataFileConceptPathSet;
 
-
-
     public ClinicalPivotDataConverter(boolean multipleStudies, String study, String inputFileLoc,
                                       String workingDirectory, boolean deleteFlag, boolean snpDataExists) {
         this.inputFileLoc = inputFileLoc;
@@ -30,11 +28,19 @@ public class ClinicalPivotDataConverter {
         this.snpDataExists = snpDataExists;
     }
 
+    private static String[] parse_line(String line) {
+        String[] buf = line.split("\t");
+        buf[0] = buf[0].replace("\"", "");
+        buf[3] = buf[3].replace("\"", "");
+        buf[4] = buf[4].replace("\"", "");
+        return buf
+    }
+
 
     private void readMatrix() throws IOException {
         File baseFile = new File(inputFileLoc);
         //create data files
-        dataFile = new HashMap<String, String>();//PATIENT.ID + CONCEPT_PATH, VALUE
+        //dataFile = new HashMap<String, String>();//PATIENT.ID + CONCEPT_PATH, VALUE
         dataFilePatientIdSet = new HashSet<String>();//PATIENT.ID
         dataFileConceptPathSet = new HashSet<String>();//CONCEPT_PATH
 
@@ -45,19 +51,12 @@ public class ClinicalPivotDataConverter {
         BufferedReader br = new BufferedReader(fr);
         br.readLine();
 
-
         while ((s = br.readLine()) != null) {
-            buf = s.split("\t");
-            buf[0] = buf[0].replace("\"", "");
-            buf[3] = buf[3].replace("\"", "");
-            buf[4] = buf[4].replace("\"", "");
+            buf = parse_line(s)
             if (snpDataExists) {
 
             }
-
-//            cache.put(new Element(buf[0] + buf[3], buf[4]));
-
-//            dataFile.put(buf[0] + buf[3], buf[4]);
+            //dataFile.put(buf[0] + buf[3], buf[4]);
             dataFileConceptPathSet.add(buf[3]);
             dataFilePatientIdSet.add(buf[0]);
 
@@ -94,7 +93,7 @@ public class ClinicalPivotDataConverter {
                 buf[indexSpn] = buf[indexSpn].replace("\"", "");
                 dataFilePatientIdSet.add(buf[0] + "\t" + buf[indexSpn]);
             }
-            dataFile.put((buf[0] + buf[3]), buf[4]);
+            dataFile.put(buf[0] + buf[3], buf[4]);
             dataFileConceptPathSet.add(buf[3]);
         }
         br.close();
@@ -126,106 +125,58 @@ public class ClinicalPivotDataConverter {
 
     private void pivot(String outputFileName) throws IOException {
 
+        int rowCount = dataFilePatientIdSet.size() + 1;
+        int columnCount = dataFileConceptPathSet.size() + 1;
         String[] dataFilePatientIdArray = dataFilePatientIdSet.toArray(new String[dataFilePatientIdSet.size()]);
         String[] dataFileConceptPathArray = dataFileConceptPathSet.toArray(new String[dataFileConceptPathSet.size()]);
         Arrays.sort(dataFilePatientIdArray);
         Arrays.sort(dataFileConceptPathArray);
 
-        File f = new File(outputFileName);
-        BufferedWriter writer;
-        f.createNewFile();
-        writer = new BufferedWriter(new FileWriter(outputFileName));
+        BufferedReader br = new BufferedReader(new FileReader(inputFileLoc));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName));
 
-        File baseFile = new File(inputFileLoc);
-        FileReader fr = new FileReader(baseFile);
-        BufferedReader br = new BufferedReader(fr);
-        br.readLine();
+        br.readLine()
 
-        writer.write("PATIENT ID");
-        writer.write("\t");
-        int indexColumn = 0;
-
-        for (String temp : dataFileConceptPathArray) {
-            writer.write(temp);
-            if (indexColumn != dataFileConceptPathArray.length - 1) {
-                writer.write("\t");
-                indexColumn++;
-            }
-
+        // write head
+        writer.write("PATIENT ID")
+        for (String dataFileConceptPath : dataFileConceptPathArray) {
+            writer.write("\t")
+            writer.write(dataFileConceptPath)
         }
         writer.write("\n")
 
-
-        String s;
-        String[] buf;
-
-        if ((s = br.readLine()) != null) {
-            buf = s.split("\t");
-            buf[0] = buf[0].replace("\"", "");
-            buf[3] = buf[3].replace("\"", "");
-            buf[4] = buf[4].replace("\"", "");
-        }
-
-
+        // write body
         for (String dataFilePatientId : dataFilePatientIdArray) {
-            writer.write(dataFilePatientId);
-            writer.write("\t");
-            indexColumn = 0;
-
-            for (String dataFileConceptPath : dataFileConceptPathArray) {
-                String value
-
-                if (s == null) {
-                    value = "NA";
-                }
-
-                if (buf[0].equals(dataFilePatientId) && buf[3].equals(dataFileConceptPath)) {
-                    value = buf[4]
-
-//                    if ((s = br.readLine()) != null) {
-//                        buf = s.split("\t");
-//                        buf[0] = buf[0].replace("\"", "");
-//                        buf[3] = buf[3].replace("\"", "");
-//                        buf[4] = buf[4].replace("\"", "");
-//                    }
-
-                    boolean flag = true;
-                    String[] bufTmp;
-
-                    while (flag && ((s = br.readLine()) != null)) {
-                        bufTmp = s.split("\t");\
-                        bufTmp[0] = bufTmp[0].replace("\"", "");
-                        bufTmp[3] = bufTmp[3].replace("\"", "");
-                        bufTmp[4] = bufTmp[4].replace("\"", "");
-
-                        flag = bufTmp[0].equals(buf[0]) && bufTmp[3].equals(buf[3])
-
-                        if (flag) {
-                            value = bufTmp[4]
-                        }
-
-                    }
-                    buf = bufTmp
-
+            // read data for patient
+            Map patientData = new HashMap(dataFileConceptPathArray.size())
+            while (true) {
+                br.mark(4096)
+                String line = br.readLine()
+                if (line == null)
+                    break
+                String[] buf = parse_line(line)
+                if (buf[0].equals(dataFilePatientId)) {
+                    patientData.put(buf[3], buf[4])
                 } else {
-                    value = "NA"
+                    br.reset()
+                    break
                 }
-
-                writer.write(value);
-
-                if (indexColumn != dataFileConceptPathArray.length - 1)
-                    writer.write("\t");
-
-                indexColumn++;
             }
-            writer.write("\n")
-            writer.flush();
 
+            // write row
+            writer.write(dataFilePatientId)
+            for (String dataFileConceptPath : dataFileConceptPathArray) {
+                writer.write("\t")
+                String val = patientData.get(dataFileConceptPath, "NA")
+                writer.write(val)
+            }
+
+            writer.write("\n")
         }
 
-        writer.close();
-        br.close();
-        fr.close();
+
+        br.close()
+        writer.close()
     }
 
     private void pivotSpn(String outputFileName) throws IOException {
@@ -256,8 +207,6 @@ public class ClinicalPivotDataConverter {
         }
         writeFile(matrix, outputFileName);
     }
-
-
 
     public void writeFile(String[][] matrix, String outputFileName) throws IOException {
         File f = new File(outputFileName);
