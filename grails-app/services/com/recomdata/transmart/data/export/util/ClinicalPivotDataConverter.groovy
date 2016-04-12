@@ -17,6 +17,7 @@ public class ClinicalPivotDataConverter {
     private Map<String, String> dataFile;
     private Set<String> dataFilePatientIdSet;
     private Set<String> dataFileConceptPathSet;
+    private int maxStringLengthPerFile;
 
     public ClinicalPivotDataConverter(boolean multipleStudies, String study, String inputFileLoc,
                                       String workingDirectory, boolean deleteFlag, boolean snpDataExists) {
@@ -45,22 +46,26 @@ public class ClinicalPivotDataConverter {
         dataFileConceptPathSet = new HashSet<String>();//CONCEPT_PATH
 
         String[] buf;
-        String s;
+        String readString;
         //read file
         FileReader fr = new FileReader(baseFile);
         BufferedReader br = new BufferedReader(fr);
         br.readLine();
 
-        while ((s = br.readLine()) != null) {
-            buf = parse_line(s)
+        while ((readString = br.readLine()) != null) {
+            buf = parse_line(readString)
             if (snpDataExists) {
 
             }
+
             //dataFile.put(buf[0] + buf[3], buf[4]);
             dataFileConceptPathSet.add(buf[3]);
             dataFilePatientIdSet.add(buf[0]);
 
+            maxStringLengthPerFile = Math.max(maxStringLengthPerFile , readString.length() + 100)
+
         }
+
         br.close();
         fr.close();
     }
@@ -124,9 +129,6 @@ public class ClinicalPivotDataConverter {
     }
 
     private void pivot(String outputFileName) throws IOException {
-
-        int rowCount = dataFilePatientIdSet.size() + 1;
-        int columnCount = dataFileConceptPathSet.size() + 1;
         String[] dataFilePatientIdArray = dataFilePatientIdSet.toArray(new String[dataFilePatientIdSet.size()]);
         String[] dataFileConceptPathArray = dataFileConceptPathSet.toArray(new String[dataFileConceptPathSet.size()]);
         Arrays.sort(dataFilePatientIdArray);
@@ -145,12 +147,11 @@ public class ClinicalPivotDataConverter {
         }
         writer.write("\n")
 
-        // write body
         for (String dataFilePatientId : dataFilePatientIdArray) {
-            // read data for patient
+
             Map patientData = new HashMap(dataFileConceptPathArray.size())
             while (true) {
-                br.mark(4096)
+                br.mark(maxStringLengthPerFile)
                 String line = br.readLine()
                 if (line == null)
                     break
@@ -163,7 +164,6 @@ public class ClinicalPivotDataConverter {
                 }
             }
 
-            // write row
             writer.write(dataFilePatientId)
             for (String dataFileConceptPath : dataFileConceptPathArray) {
                 writer.write("\t")
