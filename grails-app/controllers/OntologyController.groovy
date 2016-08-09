@@ -1,5 +1,7 @@
 import annotation.AmTagItem
 import annotation.AmTagTemplate
+import com.recomdata.transmart.domain.i2b2.ExtData
+import com.recomdata.transmart.domain.i2b2.ExtDataType
 import fm.FmFolder
 import fm.FmFolderAssociation
 import grails.converters.JSON
@@ -117,4 +119,27 @@ class OntologyController {
         }
     }
 
+    def showExtFiles = {
+        OntologyTerm term = conceptsResourceService.getByKey(params.conceptKey)
+        def files = ExtData.findAll(' FROM ExtData ED WHERE ED.study = :study', [study: term.fullName])
+            render template: 'showExtFiles', model: [study : term.fullName, files : files]
+
+    }
+
+    def addExtFile = {
+        OntologyTerm term = conceptsResourceService.getByKey(params.conceptKey)
+        def types = ExtDataType.findAll(' FROM ExtDataType')
+        render template: 'addExtFile', model: [study : term.fullName, types : types]
+    }
+
+    def addExtFileDone = {
+        OntologyTerm term = conceptsResourceService.getByKey(params.conceptKey)
+        def newData = new ExtData()
+        newData.name=params.name
+        newData.description=params.desc
+        newData.link=params.link
+        newData.study=term.fullName
+        newData.dataType=ExtDataType.get(Integer.parseInt(params.datatype_id))
+        newData.save()
+    }
 }

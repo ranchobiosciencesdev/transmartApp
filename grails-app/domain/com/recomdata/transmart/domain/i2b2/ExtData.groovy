@@ -12,7 +12,7 @@ class ExtData {
         version false
         //id generator: 'sequence', params: [sequence: 'I2B2METADATA.EXTDATA_SEQ']
         columns {
-            id               column: 'EXTDATA_ID'
+            id               column: 'extdata_id'
             name             column: 'NAME'
             description      column: 'DESCRIPTION'
             link             column: 'LINK'

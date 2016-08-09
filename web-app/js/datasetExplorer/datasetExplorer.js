@@ -1933,19 +1933,39 @@ function createExportItem(name, setid) {
 
 
 function ontologyRightClick(eventNode, event) {
-    if (!this.contextMenuOntology) {
-		this.contextMenuOntology = new Ext.menu.Menu(
+	if (!this.contextMenuOntology) {
+		if (eventNode.attributes.visualattributes.toString().contains('STUDY')) {
+			this.contextMenuOntology = new Ext.menu.Menu(
 				{
-					id : 'contextMenuOntology',
-					items : [
-					         {
-                        text: 'Show Definition', handler: function () {
-					        	 showConceptInfoDialog(eventNode.attributes.id, eventNode.attributes.text, eventNode.attributes.comment);
-					        	 }
-					         }
-					         ]
+					id: 'contextMenuOntology',
+					items: [
+						{
+							text: 'Show Definition', handler: function () {
+							showConceptInfoDialog(eventNode.attributes.id, eventNode.attributes.text, eventNode.attributes.comment);
+						}
+						},
+						{
+							text: 'Manage External Data', handler: function () {
+							showManageExtDialog(eventNode.attributes.id, eventNode.attributes.id, eventNode.attributes.comment);
+						}
+						}
+					]
 				}
-		);
+			);
+		} else {
+			this.contextMenuOntology = new Ext.menu.Menu(
+				{
+					id: 'contextMenuOntology',
+					items: [
+						{
+							text: 'Show Definition', handler: function () {
+							showConceptInfoDialog(eventNode.attributes.id, eventNode.attributes.text, eventNode.attributes.comment);
+							}
+						}
+					]
+				}
+			);
+		}
 	}
 	var xy = event.getXY();
 	this.contextMenuOntology.showAt(xy);
@@ -2045,6 +2065,135 @@ function showConceptInfoDialog(conceptKey, conceptid, conceptcomment) {
 		});
 
 
+}
+
+function showManageExtDialog(conceptKey, conceptid, conceptcomment) {
+
+	if (!this.extFilesWin) {
+		var link = '<a href="javascript:;"  onclick="return popitup(\'http://www.google.com/search?q='+conceptid+'\')">Search for more information...</a>'
+		extFilesWin= new Ext.Window(
+			{
+				id : 'manageExtFiles',
+				//title : 'List of external files',
+				layout : 'fit',
+				width : 800,
+				height : 500,
+				closable : false,
+				bodyCls: 'overlay',
+				baseCls: 'overlay',
+				plain : true,
+				modal : true,
+				border : false,
+				autoScroll: true,
+				buttons : [
+					{
+						text : 'Add',
+						handler: function () {
+							extFilesWin.hide();
+							addBtnHandler (conceptKey, conceptid, conceptcomment)
+						}
+					}
+				],
+				resizable : false
+			}
+		);
+	}
+
+	extFilesWin.show(viewport);
+	//conceptinfowin.header.update("List of external files");
+	Ext.get(extFilesWin.body.id).update(conceptcomment);
+
+	extFilesWin.load({
+		url: pageInfo.basePath+"/ontology/showExtFiles",
+		params: {conceptKey:conceptKey}, // or a URL encoded string
+		discardUrl: true,
+		nocache: true,
+		text: "Loading...",
+		timeout: 30000,
+		scripts: false
+	});
+
+
+}
+
+function addBtnHandler (conceptKey, conceptid, conceptcomment){
+	if (!this.addwin) {
+		var link = '<a href="javascript:;"  onclick="return popitup(\'http://www.google.com/search?q='+conceptid+'\')">Search for more information...</a>'
+		addwin = new Ext.Window(
+			{
+				id : 'addExtFile',
+				layout : 'fit',
+				width : 400,
+				height : 400,
+				closable : false,
+				plain : true,
+				modal : true,
+				border : false,
+				autoScroll: true,
+				bodyCls: 'overlay',
+				baseCls: 'overlay',
+				buttons : [
+					{
+						text : 'Save',
+						handler: function () {
+							var filename = document.getElementById("filename").value;
+							console.log("TEST: "+filename);
+							var description = document.getElementById("description").value;
+							console.log("TEST: "+description);
+							var link = document.getElementById("link").value;
+							console.log("TEST: "+link);
+							var selectedType = document.getElementById("datatype");
+							var selectedValue = selectedType.options[selectedType.selectedIndex].value;
+							console.log("TEST: "+selectedValue);
+							if (filename!="" && description!="" && link!="") {
+								addwin.load({
+									url: pageInfo.basePath + "/ontology/addExtFileDone",
+									params: {
+										conceptKey: conceptKey,
+										name: filename,
+										desc: description,
+										link: link,
+										datatype_id: selectedValue
+									}, // or a URL encoded string
+									/*discardUrl: true,
+									 nocache: true,
+									 text: "Loading...",
+									 timeout: 30000,
+									 scripts: false*/
+								});
+								addwin.hide();
+								showManageExtDialog(conceptKey, conceptid, conceptcomment);
+							} else {
+								window.alert("Check the fields!")
+							}
+						}
+					},
+					{
+						text : 'Cancel',
+						handler: function () {
+							addwin.hide();
+							showManageExtDialog(conceptKey, conceptid, conceptcomment);
+						}
+					}
+
+				],
+				resizable : false
+			}
+		);
+	}
+
+	addwin.show(viewport);
+	Ext.get(addwin.body.id).update(conceptcomment);
+
+	addwin.load({
+		url: pageInfo.basePath+"/ontology/addExtFile",
+		params: {conceptKey:conceptKey}, // or a URL encoded string
+		discardUrl: true,
+		nocache: true,
+		text: "Loading...",
+		timeout: 30000,
+		scripts: false
+	});
 }
 
 function showQuerySummaryWindow(source) {

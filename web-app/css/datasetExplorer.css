@@ -209,6 +209,52 @@ div.analysistitle {
 	color:#ff0000;	
 }
 
+table.extFiles {
+	border-collapse:collapse;
+	width: 100%;
+	border:1px solid #ccc;
+	font: 10px verdana, arial, helvetica, sans-serif;
+}
+
+table.extFiles td {
+	font: 10px verdana, arial, helvetica, sans-serif;
+	padding: 5px 3px 0px;
+	text-align: left;
+	vertical-align: top;
+	border-top:1px solid #ccc;
+}
+
+table.extFiles td.name {
+	font-weight:bold;
+	background-color:#fff;
+}
+
+table.extFiles td.buttons {
+	padding: 0;
+	text-align: center;
+	vertical-align: middle;
+	width: 110px;
+	border-left:1px solid #ccc;
+}
+
+table.extFiles td.value {
+	background-color:#bbb;
+}
+
+td.prop, td.name {line-height: normal;}
+
+table.extFiles th {
+	font: 10px verdana, arial, helvetica, sans-serif;
+	padding: 0px 3px 5px;
+	text-align: left;
+	vertical-align: top;
+	border-bottom:1px solid #ccc;
+}
+
+.extButtons {
+	font-size: 10px;
+}
+
 table.detail {
     border-collapse:collapse;
     width: 100%;

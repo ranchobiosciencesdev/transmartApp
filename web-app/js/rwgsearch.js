@@ -989,6 +989,10 @@ jQuery(document).ready(function() {
 		jQuery('#createProgramOverlay').fadeOut();	
   });
 
+	jQuery('body').on('click', '#closepopup', function() {
+		Ext.getCmp('manageExtFiles').hide();
+	});
+
     //Close export and filter overlays on click outside
     jQuery('body').on('click', function(e) {
 
