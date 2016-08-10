@@ -2074,7 +2074,6 @@ function showManageExtDialog(conceptKey, conceptid, conceptcomment) {
 		extFilesWin= new Ext.Window(
 			{
 				id : 'manageExtFiles',
-				//title : 'List of external files',
 				layout : 'fit',
 				width : 800,
 				height : 500,
@@ -2100,7 +2099,6 @@ function showManageExtDialog(conceptKey, conceptid, conceptcomment) {
 	}
 
 	extFilesWin.show(viewport);
-	//conceptinfowin.header.update("List of external files");
 	Ext.get(extFilesWin.body.id).update(conceptcomment);
 
 	extFilesWin.load({
@@ -2136,16 +2134,31 @@ function addBtnHandler (conceptKey, conceptid, conceptcomment){
 					{
 						text : 'Save',
 						handler: function () {
+							var error = false;
+							var errorMsg = "Error!\n";
 							var filename = document.getElementById("filename").value;
-							console.log("TEST: "+filename);
 							var description = document.getElementById("description").value;
-							console.log("TEST: "+description);
-							var link = document.getElementById("link").value;
-							console.log("TEST: "+link);
 							var selectedType = document.getElementById("datatype");
 							var selectedValue = selectedType.options[selectedType.selectedIndex].value;
-							console.log("TEST: "+selectedValue);
-							if (filename!="" && description!="" && link!="") {
+							var link = document.getElementById("link").value;
+							if (filename == "") {
+								error = true;
+								errorMsg += "Field Name is empty!\n";
+							}
+							if (description == ""){
+								error = true;
+								errorMsg += "Field Description is empty!\n";
+							}
+							if (link == ""){
+								error = true;
+								errorMsg += "Field Link is empty!\n";
+							} else {
+								if (!document.getElementById("link").checkValidity()) {
+									error = true;
+									errorMsg += "Field Link is invalid!\n";
+								}
+							}
+							if (!error) {
 								addwin.load({
 									url: pageInfo.basePath + "/ontology/addExtFileDone",
 									params: {
@@ -2154,17 +2167,12 @@ function addBtnHandler (conceptKey, conceptid, conceptcomment){
 										desc: description,
 										link: link,
 										datatype_id: selectedValue
-									}, // or a URL encoded string
-									/*discardUrl: true,
-									 nocache: true,
-									 text: "Loading...",
-									 timeout: 30000,
-									 scripts: false*/
+									}
 								});
 								addwin.hide();
 								showManageExtDialog(conceptKey, conceptid, conceptcomment);
 							} else {
-								window.alert("Check the fields!")
+								window.alert(errorMsg)
 							}
 						}
 					},
@@ -2194,6 +2202,23 @@ function addBtnHandler (conceptKey, conceptid, conceptcomment){
 		timeout: 30000,
 		scripts: false
 	});
+}
+
+function checkURL(url){
+	var http = new XMLHttpRequest();
+	http.open('HEAD', url, true);
+	http.withCredentials = true;
+	/*http.onreadystatechange = function() {
+		if (this.readyState == this.DONE) {
+			console.log('STATUS: '+this.status)
+			return (this.status >= 200 && this.status <=230);
+		} else {
+			console.log('STATUS: '+this.status)
+			return false;
+		}
+	};*/
+	http.send();
+	return false;
 }
 
 function showQuerySummaryWindow(source) {
