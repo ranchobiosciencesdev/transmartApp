@@ -11,19 +11,28 @@
     </table>
 </g:if>
 <g:else>
-    <table class="extFiles" style="width: 755px;">
+    <table id="extFilesTable" class="extFiles" style="width: 755px;">
         <g:each in="${files}" var="file">
-            <tr class="prop">
-                <td valign="top" class="name">${file.name} (${file.dataType.name})</td>
-                <td valign="top" class="name"><font color="blue">Link: </font><a href=${file.link}>${file.link}</a></td>
-                <td class="buttons" rowspan="2"><button class="extButtons" name="">Edit</button>  <button class="extButtons">Delete</button></td>
-            </tr>
-            <tr class="prop">
-                <th colspan="2">
-                <font color="gray">${file.description}</font>
-                </th>
-            </tr>
+            <tbody>
+                <tr class="prop">
+                    <td valign="top" class="name">${file.name} (${file.dataType.name})</td>
+                    <td valign="top" class="name"><font color="blue">Link: </font><a
+                            href=${file.link}>${file.link}</a></td>
+                    <td class="buttons" rowspan="2"><button class="extButtons"
+                                                            onclick="extFilesWin.hide();editBtnHandler('${conceptKey}','${conceptid}','${conceptcomment}',${file.id})">Edit</button>  <button class="extButtons"
+                                                                                                      onclick="closest('tbody').remove();
+                                                                                                      <g:remoteFunction action="deleteExtFile" id="${file.id}" />">Delete</button>
+                    </td>
+                </tr>
+                <tr class="prop">
+                    <th colspan="2">
+                    <font color="gray">${file.description}</font>
+                    </th>
+                </tr>
+            </tbody>
         </g:each>
     </table>
 </g:else>
-<!--button id="addButton" name="${study}" class="extButtons" >Add</button-->
+<br/>
+<br/>
+<button id="add" onclick="extFilesWin.hide();addBtnHandler ('${conceptKey}','${conceptid}','${conceptcomment}')">Add</button>

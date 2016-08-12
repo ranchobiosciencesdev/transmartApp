@@ -12,6 +12,7 @@ import org.transmartproject.core.ontology.ConceptsResource
 import org.transmartproject.core.ontology.OntologyTerm
 import org.transmartproject.core.ontology.StudiesResource
 import org.transmartproject.core.ontology.Study
+import groovy.json.StringEscapeUtils
 
 class OntologyController {
 
@@ -121,18 +122,51 @@ class OntologyController {
 
     def showExtFiles = {
         OntologyTerm term = conceptsResourceService.getByKey(params.conceptKey)
+        def conceptKey = escapeJavascript(null,params.conceptKey)
+        def conceptid = escapeJavascript(null,params.conceptid)
+        def conceptcomment = escapeJavascript(null,params.conceptcomment)
         def files = ExtData.findAll(' FROM ExtData ED WHERE ED.study = :study', [study: term.fullName])
-            render template: 'showExtFiles', model: [study : term.fullName, files : files]
+            render template: 'showExtFiles', model: [study : term.fullName, files : files, conceptKey : conceptKey, conceptid : conceptid, conceptcomment : conceptcomment ]
+    }
 
+    def editExtFile = {
+        def conceptKey = escapeJavascript(null,params.conceptKey)
+        def conceptid = escapeJavascript(null,params.conceptid)
+        def conceptcomment = escapeJavascript(null,params.conceptcomment)
+        OntologyTerm term = conceptsResourceService.getByKey(params.conceptKey)
+        def types = ExtDataType.findAll(' FROM ExtDataType')
+        def fileId = params.fileId
+        def file = ExtData.get(params.fileId)
+        render template: 'editExtFile', model: [study : term.fullName, types : types, file: file, conceptKey : conceptKey, conceptid : conceptid, conceptcomment : conceptcomment]
     }
 
     def addExtFile = {
+        def conceptKey = escapeJavascript(null,params.conceptKey)
+        def conceptid = escapeJavascript(null,params.conceptid)
+        def conceptcomment = escapeJavascript(null,params.conceptcomment)
         OntologyTerm term = conceptsResourceService.getByKey(params.conceptKey)
         def types = ExtDataType.findAll(' FROM ExtDataType')
-        render template: 'addExtFile', model: [study : term.fullName, types : types]
+        render template: 'addExtFile', model: [study : term.fullName, types : types, conceptKey : conceptKey, conceptid : conceptid, conceptcomment : conceptcomment]
+    }
+
+    def deleteExtFile = {
+        def extDataFile = ExtData.get(params.id)
+        extDataFile.delete()
+    }
+
+    def editExtFileDone = {
+        OntologyTerm term = conceptsResourceService.getByKey(params.conceptKey)
+        def newData = ExtData.get(params.fileId)
+        newData.name=params.name
+        newData.description=params.desc
+        newData.link=params.link
+        newData.study=term.fullName
+        newData.dataType=ExtDataType.get(Integer.parseInt(params.datatype_id))
+        newData.save()
     }
 
     def addExtFileDone = {
+        print("ALARMDONE!"+params.conceptKey)
         OntologyTerm term = conceptsResourceService.getByKey(params.conceptKey)
         def newData = new ExtData()
         newData.name=params.name

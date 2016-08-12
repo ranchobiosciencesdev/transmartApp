@@ -18,7 +18,6 @@ var runner = new Ext.util.TaskRunner();
 
 var wfsWindow = null;
 
-
 function dataSelectionCheckboxChanged(ctl) {
     if (getSelected(ctl)[0] != undefined) {
 		Ext.getCmp("exportStepDataSelectionNextButton").enable();
@@ -2084,15 +2083,6 @@ function showManageExtDialog(conceptKey, conceptid, conceptcomment) {
 				modal : true,
 				border : false,
 				autoScroll: true,
-				buttons : [
-					{
-						text : 'Add',
-						handler: function () {
-							extFilesWin.hide();
-							addBtnHandler (conceptKey, conceptid, conceptcomment)
-						}
-					}
-				],
 				resizable : false
 			}
 		);
@@ -2103,15 +2093,48 @@ function showManageExtDialog(conceptKey, conceptid, conceptcomment) {
 
 	extFilesWin.load({
 		url: pageInfo.basePath+"/ontology/showExtFiles",
-		params: {conceptKey:conceptKey}, // or a URL encoded string
+		params: {conceptKey:conceptKey, conceptid:conceptid, conceptcomment:conceptcomment}, // or a URL encoded string
 		discardUrl: true,
 		nocache: true,
 		text: "Loading...",
 		timeout: 30000,
 		scripts: false
 	});
+}
 
 
+function editBtnHandler(conceptKey, conceptid, conceptcomment, fileId){
+
+	if (!this.editwin) {
+		editwin = new Ext.Window(
+			{
+				id : 'editExtFile',
+				layout : 'fit',
+				width : 400,
+				height : 400,
+				closable : false,
+				plain : true,
+				modal : true,
+				border : false,
+				autoScroll: true,
+				bodyCls: 'overlay',
+				baseCls: 'overlay',
+				resizable : false
+			}
+		);
+	}
+
+	editwin.show(viewport);
+
+	editwin.load({
+		url: pageInfo.basePath+"/ontology/editExtFile",
+		params: {conceptKey:conceptKey, fileId: fileId}, // or a URL encoded string
+		discardUrl: true,
+		nocache: true,
+		text: "Loading...",
+		timeout: 30000,
+		scripts: false
+	});
 }
 
 function addBtnHandler (conceptKey, conceptid, conceptcomment){
@@ -2130,61 +2153,6 @@ function addBtnHandler (conceptKey, conceptid, conceptcomment){
 				autoScroll: true,
 				bodyCls: 'overlay',
 				baseCls: 'overlay',
-				buttons : [
-					{
-						text : 'Save',
-						handler: function () {
-							var error = false;
-							var errorMsg = "Error!\n";
-							var filename = document.getElementById("filename").value;
-							var description = document.getElementById("description").value;
-							var selectedType = document.getElementById("datatype");
-							var selectedValue = selectedType.options[selectedType.selectedIndex].value;
-							var link = document.getElementById("link").value;
-							if (filename == "") {
-								error = true;
-								errorMsg += "Field Name is empty!\n";
-							}
-							if (description == ""){
-								error = true;
-								errorMsg += "Field Description is empty!\n";
-							}
-							if (link == ""){
-								error = true;
-								errorMsg += "Field Link is empty!\n";
-							} else {
-								if (!document.getElementById("link").checkValidity()) {
-									error = true;
-									errorMsg += "Field Link is invalid!\n";
-								}
-							}
-							if (!error) {
-								addwin.load({
-									url: pageInfo.basePath + "/ontology/addExtFileDone",
-									params: {
-										conceptKey: conceptKey,
-										name: filename,
-										desc: description,
-										link: link,
-										datatype_id: selectedValue
-									}
-								});
-								addwin.hide();
-								showManageExtDialog(conceptKey, conceptid, conceptcomment);
-							} else {
-								window.alert(errorMsg)
-							}
-						}
-					},
-					{
-						text : 'Cancel',
-						handler: function () {
-							addwin.hide();
-							showManageExtDialog(conceptKey, conceptid, conceptcomment);
-						}
-					}
-
-				],
 				resizable : false
 			}
 		);
@@ -2204,21 +2172,91 @@ function addBtnHandler (conceptKey, conceptid, conceptcomment){
 	});
 }
 
-function checkURL(url){
-	var http = new XMLHttpRequest();
-	http.open('HEAD', url, true);
-	http.withCredentials = true;
-	/*http.onreadystatechange = function() {
-		if (this.readyState == this.DONE) {
-			console.log('STATUS: '+this.status)
-			return (this.status >= 200 && this.status <=230);
-		} else {
-			console.log('STATUS: '+this.status)
-			return false;
+function saveChangesExtFile(conceptKey, conceptid, conceptcomment, fileId) {
+	var error = false;
+	var errorMsg = "Error!\n";
+	var filename = document.getElementById("filename").value;
+	var description = document.getElementById("description").value;
+	var selectedType = document.getElementById("datatype");
+	var selectedValue = selectedType.options[selectedType.selectedIndex].value;
+	var link = document.getElementById("link").value;
+	if (filename == "") {
+		error = true;
+		errorMsg += "Field Name is empty!\n";
+	}
+	if (description == "") {
+		error = true;
+		errorMsg += "Field Description is empty!\n";
+	}
+	if (link == "") {
+		error = true;
+		errorMsg += "Field Link is empty!\n";
+	} else {
+		if (!document.getElementById("link").checkValidity()) {
+			error = true;
+			errorMsg += "Field Link is invalid!\n";
 		}
-	};*/
-	http.send();
-	return false;
+	}
+	if (!error) {
+		editwin.load({
+			url: pageInfo.basePath + "/ontology/editExtFileDone",
+			params: {
+				conceptKey: conceptKey,
+				fileId: fileId,
+				name: filename,
+				desc: description,
+				link: link,
+				datatype_id: selectedValue
+			}
+		});
+		editwin.hide();
+		showManageExtDialog(conceptKey, conceptid, conceptcomment);
+	} else {
+		window.alert(errorMsg)
+	}
+}
+
+function saveNewExtFile(conceptKey, conceptid, conceptcomment) {
+	var error = false;
+	var errorMsg = "Error!\n";
+	var filename = document.getElementById("filename").value;
+	var description = document.getElementById("description").value;
+	var selectedType = document.getElementById("datatype");
+	var selectedValue = selectedType.options[selectedType.selectedIndex].value;
+	var link = document.getElementById("link").value;
+	if (filename == "") {
+		error = true;
+		errorMsg += "Field Name is empty!\n";
+	}
+	if (description == ""){
+		error = true;
+		errorMsg += "Field Description is empty!\n";
+	}
+	if (link == ""){
+		error = true;
+		errorMsg += "Field Link is empty!\n";
+	} else {
+		if (!document.getElementById("link").checkValidity()) {
+			error = true;
+			errorMsg += "Field Link is invalid!\n";
+		}
+	}
+	if (!error) {
+		addwin.load({
+			url: pageInfo.basePath + "/ontology/addExtFileDone",
+			params: {
+				conceptKey: conceptKey,
+				name: filename,
+				desc: description,
+				link: link,
+				datatype_id: selectedValue
+			}
+		});
+		addwin.hide();
+		showManageExtDialog(conceptKey, conceptid, conceptcomment);
+	} else {
+		window.alert(errorMsg)
+	}
 }
 
 function showQuerySummaryWindow(source) {
