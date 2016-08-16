@@ -28,7 +28,7 @@ textarea:required:valid, input:focus:valid {
 }
 </style>
 <h3 id="edittitle" class="rdc-h3">External node information</h3>
-<form id="addForm">
+<form id="editForm">
     Name: <br/>
     <input id="filename" class="widthText" type="text" name="filename" required value="${file.name}"/><br>
     Description:<br/>
@@ -49,4 +49,4 @@ textarea:required:valid, input:focus:valid {
 </form>
 <br/>
 <br/>
-<button onclick="saveChangesExtFile('${conceptKey}','${conceptid}','${conceptcomment}',${file.id})">Save</button><button onclick="addwin.hide();showManageExtDialog('${conceptKey}','${conceptid}','${conceptcomment}');">Cancel</button>
+<button onclick="saveChangesExtFile('${conceptKey}','${conceptid}','${conceptcomment}',${file.id})">Save</button><button onclick="editwin.hide();showManageExtDialog('${conceptKey}','${conceptid}','${conceptcomment}');">Cancel</button>

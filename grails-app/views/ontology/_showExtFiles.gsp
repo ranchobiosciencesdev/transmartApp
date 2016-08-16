@@ -21,7 +21,7 @@
                     <td class="buttons" rowspan="2"><button class="extButtons"
                                                             onclick="extFilesWin.hide();editBtnHandler('${conceptKey}','${conceptid}','${conceptcomment}',${file.id})">Edit</button>  <button class="extButtons"
                                                                                                       onclick="closest('tbody').remove();
-                                                                                                      <g:remoteFunction action="deleteExtFile" id="${file.id}" />">Delete</button>
+                                                                                                      <g:remoteFunction action="deleteExtFile" params="${[id:file.id]}" />">Delete</button>
                     </td>
                 </tr>
                 <tr class="prop">

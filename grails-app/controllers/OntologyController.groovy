@@ -125,8 +125,8 @@ class OntologyController {
         def conceptKey = escapeJavascript(null,params.conceptKey)
         def conceptid = escapeJavascript(null,params.conceptid)
         def conceptcomment = escapeJavascript(null,params.conceptcomment)
-        def files = ExtData.findAll(' FROM ExtData ED WHERE ED.study = :study', [study: term.fullName])
-            render template: 'showExtFiles', model: [study : term.fullName, files : files, conceptKey : conceptKey, conceptid : conceptid, conceptcomment : conceptcomment ]
+        def files = ExtData.findAllByStudy(term.fullName)
+        render template: 'showExtFiles', model: [study : term.fullName, files : files, conceptKey : conceptKey, conceptid : conceptid, conceptcomment : conceptcomment ]
     }
 
     def editExtFile = {
@@ -134,7 +134,7 @@ class OntologyController {
         def conceptid = escapeJavascript(null,params.conceptid)
         def conceptcomment = escapeJavascript(null,params.conceptcomment)
         OntologyTerm term = conceptsResourceService.getByKey(params.conceptKey)
-        def types = ExtDataType.findAll(' FROM ExtDataType')
+        def types = ExtDataType.findAll()
         def fileId = params.fileId
         def file = ExtData.get(params.fileId)
         render template: 'editExtFile', model: [study : term.fullName, types : types, file: file, conceptKey : conceptKey, conceptid : conceptid, conceptcomment : conceptcomment]
@@ -145,13 +145,15 @@ class OntologyController {
         def conceptid = escapeJavascript(null,params.conceptid)
         def conceptcomment = escapeJavascript(null,params.conceptcomment)
         OntologyTerm term = conceptsResourceService.getByKey(params.conceptKey)
-        def types = ExtDataType.findAll(' FROM ExtDataType')
+        def types = ExtDataType.findAll()
         render template: 'addExtFile', model: [study : term.fullName, types : types, conceptKey : conceptKey, conceptid : conceptid, conceptcomment : conceptcomment]
     }
 
     def deleteExtFile = {
         def extDataFile = ExtData.get(params.id)
         extDataFile.delete()
+        // return something to prevent error 404
+        render "Done"
     }
 
     def editExtFileDone = {
@@ -163,6 +165,8 @@ class OntologyController {
         newData.study=term.fullName
         newData.dataType=ExtDataType.get(Integer.parseInt(params.datatype_id))
         newData.save()
+        // return something to prevent error 404
+        render "Done"
     }
 
     def addExtFileDone = {
@@ -175,5 +179,7 @@ class OntologyController {
         newData.study=term.fullName
         newData.dataType=ExtDataType.get(Integer.parseInt(params.datatype_id))
         newData.save()
+        // return something to prevent error 404
+        render "Done"
     }
 }
