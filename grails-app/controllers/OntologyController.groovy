@@ -15,7 +15,7 @@ import org.transmartproject.core.ontology.Study
 import groovy.json.StringEscapeUtils
 
 class OntologyController {
-
+    def dataSource;
     def index = {}
     def i2b2HelperService
     def springSecurityService
@@ -151,11 +151,33 @@ class OntologyController {
 
     def deleteExtFile = {
         def extDataFile = ExtData.get(params.id)
+        def fullname = extDataFile.study+extDataFile.name+' (ext)\\'
+        def jobID = null
+        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
+        sql.call("{call TM_CZ.I2B2_DELETE_ALL_NODES($fullname,$jobID)}")
+        sql.close()
         extDataFile.delete()
+
     }
 
     def editExtFileDone = {
         OntologyTerm term = conceptsResourceService.getByKey(params.conceptKey)
+        def path = term.fullName+params.name+' (ext)'+'\\'
+        def oldname = params.oldName;
+        def oldPath = term.fullName+oldname+' (ext)'
+        def trialID = term.study.id
+        def pathName =params.name+' (ext)'
+        def jobid=null
+        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
+        sql.call("{call TM_CZ.I2B2_DELETE_ALL_NODES($oldPath,$jobid)}")
+        sql.call("{call TM_CZ.I2B2_ADD_NODE($trialID,$path,$pathName, $jobid)}")
+        def datatype = Integer.parseInt(params.datatype_id)
+        if(datatype==1) {
+            sql.executeUpdate("update i2b2metadata.i2b2 set C_VISUALATTRIBUTES='LA' where C_FULLNAME = $path")
+        } else {
+            sql.executeUpdate("update i2b2metadata.i2b2 set C_VISUALATTRIBUTES='LAH' where C_FULLNAME = $path")
+        }
+        sql.close()
         def newData = ExtData.get(params.fileId)
         newData.name=params.name
         newData.description=params.desc
@@ -168,6 +190,19 @@ class OntologyController {
     def addExtFileDone = {
         print("ALARMDONE!"+params.conceptKey)
         OntologyTerm term = conceptsResourceService.getByKey(params.conceptKey)
+        def path = term.fullName+params.name+' (ext)'+'\\'
+        def trialID = term.study.id
+        def pathName =params.name+' (ext)'
+        def jobid=null
+        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
+        sql.call("{call TM_CZ.I2B2_ADD_NODE($trialID,$path,$pathName, $jobid)}")
+        def datatype = Integer.parseInt(params.datatype_id)
+        if(datatype==1) {
+            sql.executeUpdate("update i2b2metadata.i2b2 set C_VISUALATTRIBUTES='LA' where C_FULLNAME = $path")
+        } else {
+            sql.executeUpdate("update i2b2metadata.i2b2 set C_VISUALATTRIBUTES='LAH' where C_FULLNAME = $path")
+        }
+        sql.close()
         def newData = new ExtData()
         newData.name=params.name
         newData.description=params.desc
@@ -175,5 +210,7 @@ class OntologyController {
         newData.study=term.fullName
         newData.dataType=ExtDataType.get(Integer.parseInt(params.datatype_id))
         newData.save()
+
+        print("SaveDONE!"+params.conceptKey)
     }
 }

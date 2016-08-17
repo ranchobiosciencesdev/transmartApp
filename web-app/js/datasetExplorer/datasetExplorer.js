@@ -2172,7 +2172,7 @@ function addBtnHandler (conceptKey, conceptid, conceptcomment){
 	});
 }
 
-function saveChangesExtFile(conceptKey, conceptid, conceptcomment, fileId) {
+function saveChangesExtFile(conceptKey, conceptid, conceptcomment, fileId, oldname) {
 	var error = false;
 	var errorMsg = "Error!\n";
 	var filename = document.getElementById("filename").value;
@@ -2206,7 +2206,8 @@ function saveChangesExtFile(conceptKey, conceptid, conceptcomment, fileId) {
 				name: filename,
 				desc: description,
 				link: link,
-				datatype_id: selectedValue
+				datatype_id: selectedValue,
+				oldName: oldname
 			}
 		});
 		editwin.hide();
@@ -2253,6 +2254,7 @@ function saveNewExtFile(conceptKey, conceptid, conceptcomment) {
 			}
 		});
 		addwin.hide();
+
 		showManageExtDialog(conceptKey, conceptid, conceptcomment);
 	} else {
 		window.alert(errorMsg)

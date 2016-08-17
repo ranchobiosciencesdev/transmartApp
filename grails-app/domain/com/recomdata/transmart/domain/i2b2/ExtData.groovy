@@ -21,6 +21,6 @@ class ExtData {
         }
     }
     static constraints = {
-        name(nullable: false, maxSize: 100)
+        name(blank:false, nullable: false, maxSize: 100)
     }
 }
