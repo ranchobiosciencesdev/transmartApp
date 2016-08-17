@@ -12,7 +12,6 @@ import org.transmartproject.core.ontology.ConceptsResource
 import org.transmartproject.core.ontology.OntologyTerm
 import org.transmartproject.core.ontology.StudiesResource
 import org.transmartproject.core.ontology.Study
-import groovy.json.StringEscapeUtils
 
 class OntologyController {
     def dataSource;
@@ -125,8 +124,8 @@ class OntologyController {
         def conceptKey = escapeJavascript(null,params.conceptKey)
         def conceptid = escapeJavascript(null,params.conceptid)
         def conceptcomment = escapeJavascript(null,params.conceptcomment)
-        def files = ExtData.findAll(' FROM ExtData ED WHERE ED.study = :study', [study: term.fullName])
-            render template: 'showExtFiles', model: [study : term.fullName, files : files, conceptKey : conceptKey, conceptid : conceptid, conceptcomment : conceptcomment ]
+        def files = ExtData.findAllByStudy(term.fullName, [sort: "id", order: "asc"])
+        render template: 'showExtFiles', model: [study: term.fullName, files: files, conceptKey: conceptKey, conceptid: conceptid, conceptcomment: conceptcomment]
     }
 
     def editExtFile = {
@@ -134,7 +133,7 @@ class OntologyController {
         def conceptid = escapeJavascript(null,params.conceptid)
         def conceptcomment = escapeJavascript(null,params.conceptcomment)
         OntologyTerm term = conceptsResourceService.getByKey(params.conceptKey)
-        def types = ExtDataType.findAll(' FROM ExtDataType')
+        def types = ExtDataType.findAll()
         def fileId = params.fileId
         def file = ExtData.get(params.fileId)
         render template: 'editExtFile', model: [study : term.fullName, types : types, file: file, conceptKey : conceptKey, conceptid : conceptid, conceptcomment : conceptcomment]
@@ -145,7 +144,7 @@ class OntologyController {
         def conceptid = escapeJavascript(null,params.conceptid)
         def conceptcomment = escapeJavascript(null,params.conceptcomment)
         OntologyTerm term = conceptsResourceService.getByKey(params.conceptKey)
-        def types = ExtDataType.findAll(' FROM ExtDataType')
+        def types = ExtDataType.findAll()
         render template: 'addExtFile', model: [study : term.fullName, types : types, conceptKey : conceptKey, conceptid : conceptid, conceptcomment : conceptcomment]
     }
 
@@ -157,7 +156,8 @@ class OntologyController {
         sql.call("{call TM_CZ.I2B2_DELETE_ALL_NODES($fullname,$jobID)}")
         sql.close()
         extDataFile.delete()
-
+        // we must return something to prevent error 404
+        render "Done"
     }
 
     def editExtFileDone = {
@@ -185,6 +185,8 @@ class OntologyController {
         newData.study=term.fullName
         newData.dataType=ExtDataType.get(Integer.parseInt(params.datatype_id))
         newData.save()
+        // we must return something to prevent error 404
+        render "Done"
     }
 
     def addExtFileDone = {
@@ -212,5 +214,8 @@ class OntologyController {
         newData.save()
 
         print("SaveDONE!"+params.conceptKey)
+
+        // we must return something to prevent error 404
+        render "Done"
     }
 }

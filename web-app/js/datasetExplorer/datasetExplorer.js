@@ -2208,10 +2208,13 @@ function saveChangesExtFile(conceptKey, conceptid, conceptcomment, fileId, oldna
 				link: link,
 				datatype_id: selectedValue,
 				oldName: oldname
+			},
+			callback: function() {
+				// we should wait answer before to show main window
+				editwin.hide();
+				showManageExtDialog(conceptKey, conceptid, conceptcomment);
 			}
 		});
-		editwin.hide();
-		showManageExtDialog(conceptKey, conceptid, conceptcomment);
 	} else {
 		window.alert(errorMsg)
 	}
@@ -2251,11 +2254,13 @@ function saveNewExtFile(conceptKey, conceptid, conceptcomment) {
 				desc: description,
 				link: link,
 				datatype_id: selectedValue
+			},
+			callback: function() {
+				// we should wait answer before to show main window
+				addwin.hide();
+				showManageExtDialog(conceptKey, conceptid, conceptcomment);
 			}
 		});
-		addwin.hide();
-
-		showManageExtDialog(conceptKey, conceptid, conceptcomment);
 	} else {
 		window.alert(errorMsg)
 	}
