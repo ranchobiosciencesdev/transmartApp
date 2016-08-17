@@ -252,6 +252,14 @@ class DataExportService {
                                     prefix = "S2"
                                 vcfDataService.getDataAsFile(outputDir, jobDataMap.get("jobName"), null, resultInstanceIdMap[subset], selectedSNPs, selectedGenes, chromosomes, prefix);
                                 break;
+                            case ~/^extFile-\d+$/:
+                                // TODO: add export of the external files here
+                                String extFileId = (selectedFile =~ ~/^extFile-(\d+)$/)[0][1]
+                                print "\n\n\n============================"
+                                print "subset: ${subset}"
+                                print "output dir: ${studyDir}"
+                                print "external file id: ${extFileId}"
+                                print "============================\n\n\n"
                         }
                     }
                 }

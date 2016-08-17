@@ -112,7 +112,8 @@ function getDatadata() {
 
     // load export metadata
     dataExport.exportMetaDataStore.load({
-        params: {result_instance_id1: GLOBAL.CurrentSubsetIDs[1], result_instance_id2: GLOBAL.CurrentSubsetIDs[2]},
+        params: {result_instance_id1: GLOBAL.CurrentSubsetIDs[1], result_instance_id2: GLOBAL.CurrentSubsetIDs[2],
+                 crc_query_1: getCRCQueryRequest(1), crc_query_2: getCRCQueryRequest(2)},
         scope: dataExport,
         callback: dataExport.displayResult
     });
@@ -381,6 +382,11 @@ DataExport.prototype.prepareNewStore = function (store, columns, selectedCohortD
 
         if (file.ontologyTermKeys) {
             _str_data_type = 'high dimensional';
+        }
+
+        // hack for external files
+        if (file.exporters && file.exporters.length == 1 && file.exporters[0].format == "ExtFiles") {
+            return " <br>(External files)"
         }
 
         return " <br><span class='data-export-filter-tip'>(Drag and drop " + _str_data_type

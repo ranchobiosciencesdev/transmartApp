@@ -1,9 +1,11 @@
 package com.recomdata.transmart.data.export
 
+import com.recomdata.transmart.domain.i2b2.ExtData
 import grails.converters.JSON
 import org.transmartproject.core.exceptions.AccessDeniedException
 import org.transmartproject.core.exceptions.InvalidArgumentsException
 import org.transmartproject.core.ontology.Study
+import org.transmartproject.core.querytool.QueryDefinition
 import org.transmartproject.core.users.User
 
 import java.util.regex.Matcher
@@ -19,6 +21,7 @@ class DataExportController {
     def queriesResourceAuthorizationDecorator
     def studiesResourceService
     def currentUserBean
+    def queryDefinitionXmlService
 
     private static final String ROLE_ADMIN = 'ROLE_ADMIN'
 
@@ -27,10 +30,99 @@ class DataExportController {
     //We need to gather a JSON Object to represent the different data types.
     def getMetaData() {
         checkParamResultInstanceIds()
-
-        render exportMetadataService.getMetaData(
+        // get information for base select checkboxes
+        Map result = exportMetadataService.getMetaData(
                 params.long("result_instance_id1"),
-                params.long("result_instance_id2")) as JSON
+                params.long("result_instance_id2"))
+
+        // add data for checkboxes with external data
+        // function to creation data for checkboxes
+        Closure<Map> generateExternalDataRecord = { String dataTypeId, String dataTypeName,
+                                                    boolean inSubset1, boolean inSubset2 ->
+            Map res = [
+                    "subsetId1"        : "subset1",
+                    "subsetId2"        : "subset2",
+                    "subsetName1"      : "Subset 1",
+                    "subsetName2"      : "Subset 2",
+                    "dataTypeId"       : dataTypeId,
+                    "dataTypeName"     : dataTypeName,
+                    "subset1"          : [
+                            "dataTypeHasCounts": false,
+                            "exporters"        : [
+                                    ["format"     : "ExtFiles",
+                                     "description": "External files"]],
+                    ],
+                    "subset2"          : [
+                            "dataTypeHasCounts": false,
+                            "exporters"        : [
+                                    ["format"     : "ExtFiles",
+                                     "description": "External files"]],
+                    ]
+            ]
+            if (!inSubset1) {
+                res["subset1"]["patientsNumber"] = 0
+            }
+            if (!inSubset2) {
+                res["subset2"]["patientsNumber"] = 0
+            }
+            return res
+        }
+        // parse raw data of the query to get data which attached external
+        Map<String, QueryDefinition> queryDefinitions = [
+                "subset1": queryDefinitionXmlService.fromXml(new StringReader(params.crc_query_1)),
+                "subset2": queryDefinitionXmlService.fromXml(new StringReader(params.crc_query_2))
+        ]
+        // fetch information about external files in the queries
+        Map externalFiles = [:]
+        Closure conceptKeyToSqlLikeCondition = { key -> key.substring(key.indexOf("\\", 2)).replace("\\", "\\\\") + "%"}
+        queryDefinitions.each { subset, queryDefinition ->
+            if (queryDefinition.panels.size() > 0) {
+                List<ExtData> results = ExtData.createCriteria().list {
+                    and {
+                        for (def panel : queryDefinition.panels) {
+                            if (!panel.invert) {
+                                or {
+                                    for (def item : panel.items) {
+                                        like("study", conceptKeyToSqlLikeCondition(item.conceptKey))
+                                    }
+                                }
+                            } else {
+                                not {
+                                    or {
+                                        for (def item : panel.items) {
+                                            like("study", conceptKeyToSqlLikeCondition(item.conceptKey))
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+                for (ExtData extData : results) {
+                    if (!(extData.id in externalFiles)) {
+                        externalFiles[extData.id] = [
+                                "dataTypeId"  : "extFile-${extData.id}",
+                                "dataTypeName": "External ${extData.dataType.name} \"${extData.name}\" (${extData.study})",
+                                "subset1"     : false,
+                                "subset2"     : false
+                        ]
+                    }
+                    externalFiles[extData.id][subset] = true
+                }
+            }
+        }
+        // add information about external data to checkboxes
+        for (Map externalFile : externalFiles.values().sort { a, b -> a["dataTypeName"].compareToIgnoreCase(b["dataTypeName"]) }) {
+            result["exportMetaData"].add(generateExternalDataRecord(
+                    externalFile["dataTypeId"],
+                    externalFile["dataTypeName"],
+                    externalFile["subset1"],
+                    externalFile["subset2"]
+            ))
+        }
+
+        render result as JSON
     }
 
     def downloadFileExists() {
