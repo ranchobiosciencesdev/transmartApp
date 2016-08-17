@@ -1933,7 +1933,7 @@ function createExportItem(name, setid) {
 
 function ontologyRightClick(eventNode, event) {
 	if (!this.contextMenuOntology) {
-		if (eventNode.attributes.visualattributes.toString().contains('STUDY')) {
+		if (eventNode.attributes.visualattributes.toString().indexOf('STUDY') != -1) {
 			this.contextMenuOntology = new Ext.menu.Menu(
 				{
 					id: 'contextMenuOntology',

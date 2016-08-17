@@ -1,3 +1,12 @@
+# ignore IDE folder and files
+# IntelliJ IDEA‎
+.idea/
+*.iml
+*.ipr
+*.iws
+*.log
+*.sw[op]
+# Eclipse 
 target/
 target-eclipse/
 bin/
@@ -5,12 +14,15 @@ bin/
 .classpath
 .settings
 .project
-.idea/
-*.iml
-*.ipr
-*.iws
-*.log
-*.sw[op]
+# common
+*~
+# macOS settings
 .DS_Store
+
+# grails
+.slcache
+
+# miscellanea
 System.out
 /tomcat.8080/
+
