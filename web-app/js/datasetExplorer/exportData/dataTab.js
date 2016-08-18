@@ -242,6 +242,7 @@ DataExport.prototype.displayResult = function (records, options, success) {
             buttons: [{
                 id : "dataTypesToExportRunButton",
                 text : "Export Data",
+                disabled : true,
                 handler : function () {
                     _this.createDataExportJob(_grid);
                 }
@@ -266,6 +267,7 @@ DataExport.prototype.displayResult = function (records, options, success) {
         var _newStore = _this.prepareNewStore(_this.exportMetaDataStore, _columns, _selectedCohortData);
 
         var _dataTypesGridPanel = _getDataTypesGridPanel(_newStore, _columns);
+
         _dataTypesGridPanel.records = _this.records;
         _dataTypesGridPanel.on("afterrender", _dataTypesGridPanel.dropZonesChecker);
 
@@ -347,7 +349,7 @@ DataExport.prototype.createSelectBoxHtml = function (file, subset, dataTypeId) {
     outStr = '';
     outStr +=  '<strong>' + file.patientsNumber + '</strong> patient' + (file.patientsNumber > 1 ? 's' : '');
     //TODO Show simple label if there is just one file format possible
-    outStr += '<br/><input type="checkbox" id="' + subset + '_' + dataTypeId + '" name="download_dt" ' + (file.patientsNumber < 1 ? 'disabled' : '') +' />';
+    outStr += '<br/><input type="checkbox" onchange="unlockDataExportButon()" id="' + subset + '_' + dataTypeId + '" name="download_dt" ' + (file.patientsNumber < 1 ? 'disabled' : '') +' />';
     outStr += '&nbsp;<select id="file_type_' + subset + '_' + dataTypeId + '"';
     outStr += ' name="file_type" ' + (file.patientsNumber < 1 || file.exporters.length < 2 ? 'disabled' : '') +'>';
     if(file.exporters) {
@@ -357,8 +359,38 @@ DataExport.prototype.createSelectBoxHtml = function (file, subset, dataTypeId) {
     }
     outStr += '</select><br/>';
 
+
+    //unlockDataExportButon();
+
     return outStr
 }
+
+
+function unlockDataExportButon() {
+
+    var box = jQuery( "#analysisDataExportPanel input[type=checkbox]" )
+    var isChecked = false
+
+    for(var i = 0; i < box.length; i++) {
+        var boxClinicalData = box[i];
+
+        if(boxClinicalData.checked) {
+            isChecked = true
+        }
+    }
+
+    var button = document.getElementById("dataTypesToExportRunButton");
+
+    if(isChecked) {
+        Ext.getCmp('dataTypesToExportRunButton').enable()
+    } else {
+        Ext.getCmp('dataTypesToExportRunButton').disable()
+
+    }
+
+};
+
+
 
 /**
  *
@@ -401,6 +433,7 @@ DataExport.prototype.prepareNewStore = function (store, columns, selectedCohortD
         var outStr = _this.prepareOutString(row.data.subset1, row.data.subsetId1, row.data.dataTypeId);
         this_data[row.data.subsetId1] = outStr;
 
+
         if (selectedCohortData['subset2'] != null && selectedCohortData['subset2'].length > 1) {
             // cohort string for subset 2
             this_data['dataTypeName'] = row.data.dataTypeName + _get_export_data_tip (row.data.subset2);
@@ -408,6 +441,8 @@ DataExport.prototype.prepareNewStore = function (store, columns, selectedCohortD
             outStr = _this.prepareOutString(row.data.subset2, row.data.subsetId2, row.data.dataTypeId);
             this_data[row.data.subsetId2] = outStr;
         }
+
+
 
         data.push(this_data);
     });
@@ -431,6 +466,7 @@ DataExport.prototype.prepareNewStore = function (store, columns, selectedCohortD
  */
 DataExport.prototype.createDataExportJob = function (gridPanel) {
     var _this = this;
+
     Ext.Ajax.request({
         url: pageInfo.basePath + "/dataExport/createnewjob",
         method: 'POST',
@@ -517,6 +553,7 @@ DataExport.prototype.getExportParams = function (gridPanel, selectedFiles) {
             var _data_type = gridPanel.records[i].data.dataTypeId;
 
 
+
             // get concept paths
             var _concept_path_arr = _get_concept_path(gridPanel.getView().getRow(i+1));
 
@@ -555,6 +592,7 @@ DataExport.prototype.getExportParams = function (gridPanel, selectedFiles) {
 DataExport.prototype.runDataExportJob = function (result, gridPanel) {
     var jobNameInfo = Ext.util.JSON.decode(result.responseText);
     var jobName = jobNameInfo.jobName;
+
 
     var messages = {
         cancelMsg: "Your Job has been cancelled.",
