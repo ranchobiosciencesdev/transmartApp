@@ -11,7 +11,8 @@ class ExtData {
     static mapping = {
         table 'I2B2METADATA.I2B2_EXTDATA'
         version false
-        //id generator: 'sequence', params: [sequence: 'I2B2METADATA.EXTDATA_SEQ']
+        // TODO: Fix problem with generator strategy
+        id generator: 'sequence' //, params: [sequence: 'I2B2METADATA.EXTDATA_SEQ']
         columns {
             id               column: 'EXTDATA_ID'
             name             column: 'NAME'

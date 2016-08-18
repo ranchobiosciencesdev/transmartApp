@@ -85,8 +85,6 @@ class GenericJobExecutor implements Job {
     }
 
     private void doExecute(JobDetail jobDetail) {
-
-        long startTime = System.currentTimeMillis();
         //Gather the jobs info.
         jobName = jobDetail.getName()
         jobDataMap = jobDetail.getJobDataMap()
@@ -165,10 +163,6 @@ class GenericJobExecutor implements Job {
 
         //Marking the status as complete makes the
         updateStatus(jobName, "Completed")
-
-        long endTime = System.currentTimeMillis();
-        calcAndWriteWorkingTime(startTime, endTime, "doExecute()")
-
     }
 
     private boolean isStudySelected(int studyCnt, List checkboxList) {
@@ -393,32 +387,4 @@ class GenericJobExecutor implements Job {
         }
         return jobCancelled
     }
-
-
-    def static calcAndWriteWorkingTime(long startTime, long endTime, String fileName) {
-        def directory = "/home/sergey/Downloads"
-        def folderName = "transmartMethodsWorkingTime"
-        def fileInfo = []
-        Random rand = new Random()
-        int max = 100
-        def randNumber = rand.nextInt(max+1)
-
-        File file
-
-        new File(directory + '/' + folderName).mkdir()
-        def fullFilePath = directory + '/' + folderName + '/' + fileName + randNumber + '.txt'
-
-        file = new File(fullFilePath)
-
-        boolean b = file.createNewFile()
-
-        long workingTime = endTime - startTime
-
-        fileInfo << workingTime
-        fileInfo.each {
-            file << ("${it}")
-        }
-    }
-
-
 }

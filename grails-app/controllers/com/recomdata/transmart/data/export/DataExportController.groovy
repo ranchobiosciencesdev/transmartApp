@@ -83,14 +83,14 @@ class DataExportController {
                             if (!panel.invert) {
                                 or {
                                     for (def item : panel.items) {
-                                        like("study", conceptKeyToSqlLikeCondition(item.conceptKey))
+                                        like("pathnode", conceptKeyToSqlLikeCondition(item.conceptKey))
                                     }
                                 }
                             } else {
                                 not {
                                     or {
                                         for (def item : panel.items) {
-                                            like("study", conceptKeyToSqlLikeCondition(item.conceptKey))
+                                            like("pathnode", conceptKeyToSqlLikeCondition(item.conceptKey))
                                         }
                                     }
                                 }

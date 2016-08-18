@@ -3,6 +3,7 @@ package com.recomdata.transmart.data.export
 import com.google.common.base.CharMatcher
 import com.recomdata.snp.SnpData
 import com.recomdata.transmart.data.export.exception.DataNotFoundException
+import com.recomdata.transmart.domain.i2b2.ExtData
 import groovy.json.JsonSlurper
 import groovy.sql.Sql
 import org.apache.commons.lang.StringUtils
@@ -24,6 +25,9 @@ class DataExportService {
     def additionalDataService
     def vcfDataService
     def dataSource
+
+    def fileDownloadService
+    def externalFilesDownloadService
 
     @Transactional(readOnly = true)
     def exportData(jobDataMap) {
@@ -252,14 +256,53 @@ class DataExportService {
                                     prefix = "S2"
                                 vcfDataService.getDataAsFile(outputDir, jobDataMap.get("jobName"), null, resultInstanceIdMap[subset], selectedSNPs, selectedGenes, chromosomes, prefix);
                                 break;
-                            case ~/^extFile-\d+$/:
-                                // TODO: add export of the external files here
-                                String extFileId = (selectedFile =~ ~/^extFile-(\d+)$/)[0][1]
-                                print "\n\n\n============================"
-                                print "subset: ${subset}"
-                                print "output dir: ${studyDir}"
-                                print "external file id: ${extFileId}"
-                                print "============================\n\n\n"
+                        }
+                    }
+                }
+
+                // export external data
+                selectedFilesList.each { selectedFile ->
+                    def match = selectedFile =~ ~/^extFile-(\d+)$/
+                    if (match) {
+                        // get link and prepare output folder
+                        String extFileId = match[0][1]
+                        ExtData extData = ExtData.get(Long.parseLong(extFileId))
+                        File extStudyDir = new File(jobTmpDirectory, subset + "_" + (extData.study =~ ~/\\(\w+)\\$/)[0][1])
+                        File extDir = new File(extStudyDir ,"external_" + extData.name.replaceAll(" ", "_").replaceAll("[^a-zA-Z0-9]", "") + "_" + extFileId)
+                        extDir.mkdirs()
+                        def printDataInfo = { writer ->
+                            writer.writeLine "Data node:  ${extData.pathnode}"
+                            writer.writeLine "Name: ${extData.name}"
+                            writer.writeLine "Data type: ${extData.dataType.name}"
+                            writer.writeLine "Link: ${extData.link}"
+                            writer.writeLine "Description: ${extData.description}"
+                        }
+                        try {
+                            String protocol = new URL(extData.link).protocol
+                            print "==========="
+                            switch (protocol) {
+                                case "http":
+                                case "https":
+                                    print "---"
+                                    fileDownloadService.getFiles([extData.link], extDir.toString())
+                                    break;
+                                case "ftp":
+                                    print "+++"
+                                    externalFilesDownloadService.downloadFileFromFTPServer([extData.link], extDir.toString())
+                                    break;
+                                default:
+                                    new File(extDir, "ErrorLog.txt").withWriter("UTF-8") {writer ->
+                                        writer.writeLine "Error. Unsupported protocol \"${protocol}\""
+                                        printDataInfo(writer)
+                                    }
+                                    break;
+                            }
+                        } catch (Exception e) {
+                            new File(extDir, "ErrorLog.txt").withWriter {writer ->
+                                writer.writeLine "Error. Exception \"${e}\""
+                                printDataInfo(writer)
+                                e.printStackTrace(new PrintWriter(writer))
+                            }
                         }
                     }
                 }
