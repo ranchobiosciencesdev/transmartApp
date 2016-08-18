@@ -5,6 +5,7 @@ class ExtData {
     String description
     String link
     String study
+    String pathnode
     static belongsTo = [dataType: ExtDataType]
 
     static mapping = {
@@ -12,12 +13,13 @@ class ExtData {
         version false
         //id generator: 'sequence', params: [sequence: 'I2B2METADATA.EXTDATA_SEQ']
         columns {
-            id               column: 'extdata_id'
+            id               column: 'EXTDATA_ID'
             name             column: 'NAME'
             description      column: 'DESCRIPTION'
             link             column: 'LINK'
             study            column: 'STUDY'
             dataType         column: 'DATATYPE_ID'
+            pathnode         column: 'PATHNODE'
         }
     }
     static constraints = {

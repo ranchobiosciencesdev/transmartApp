@@ -184,6 +184,7 @@ class OntologyController {
         newData.link=params.link
         newData.study=term.fullName
         newData.dataType=ExtDataType.get(Integer.parseInt(params.datatype_id))
+        newData.pathnode=path
         newData.save()
         // we must return something to prevent error 404
         render "Done"
@@ -211,6 +212,7 @@ class OntologyController {
         newData.link=params.link
         newData.study=term.fullName
         newData.dataType=ExtDataType.get(Integer.parseInt(params.datatype_id))
+        newData.pathnode=path
         newData.save()
 
         print("SaveDONE!"+params.conceptKey)

@@ -991,6 +991,7 @@ jQuery(document).ready(function() {
 
 	jQuery('body').on('click', '#closepopup', function() {
 		Ext.getCmp('manageExtFiles').hide();
+		location.reload();
 	});
 
     //Close export and filter overlays on click outside
