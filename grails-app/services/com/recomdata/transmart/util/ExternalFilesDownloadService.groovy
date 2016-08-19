@@ -1,11 +1,7 @@
 package com.recomdata.transmart.util
-
 import com.recomdata.transmart.domain.i2b2.ExtData
-import org.apache.commons.net.ftp.FTP
+import org.apache.commons.net.ftp.FTPClient
 import org.transmartproject.db.ontology.I2b2
-
-import org.apache.commons.net.ftp.FTPClient;
-
 /**
  * Created by transmart on 8/8/16.
  */
@@ -23,54 +19,64 @@ class ExternalFilesDownloadService {
     List<String> URLs = new ArrayList<>()
 
     def downloadFileFromFTPServer(List<String> URLs, String dirToDownloadTo) {
-//        String server = "192.168.20.223"
-//        int port = 21
-//        String user = "root"
-//        String pass = "root"
+        for (String url : URLs) {
+            URL aURL = new URL(url)
 
+            String server = aURL.getHost()
+            int port = 21
 
-        String server = "ftp.example.com"
-        int port = 21
-        String user = "login"
-        String pass = "password"
+            String username = "anonymous"
+            String password = System.getProperty("user.name") + "@" + InetAddress.getLocalHost().getHostName()
 
+            FTPClient ftp = new FTPClient()
+            FileOutputStream fos = null
 
-        FTPClient client = new FTPClient()
-        FileOutputStream fos = null
+            boolean successLogin = false
+            int connectingAttempts = 0
 
-        boolean successLogin = false
-        int connectingAttempts = 0
+//            println("######################################################################################################3")
+//            println(aURL.getFile())
+//            println(aURL.getHost())
+//            println(aURL.getPort())
+//            println(aURL.getFile())
+//            println(aURL.getPath())
+//            println(url.substring(url.lastIndexOf('/') + 1))
 
-        while (true) {
-            client.connect(server, port)
-            successLogin = client.login(user, pass)
+            while (true) {
+                ftp.connect(server, port)
+                successLogin = ftp.login(username, password)
 
-            if (successLogin) {
-                println("FTP server - successful login!")
-                break
-            } else {
-                println("FTP server - login denied")
-                connectingAttempts++
-                if (connectingAttempts > 3) break
+                if (successLogin) {
+                    println("FTP server - successful login!")
+                    break
+                } else {
+                    println("FTP server - login denied")
+                    connectingAttempts++
+                    if (connectingAttempts > 3) break
+                }
+
             }
 
-        }
+            if (successLogin) {
+                String filename = aURL.getFile()
+//                fos = new FileOutputStream(dirToDownloadTo + "/" + filename)
+                fos = new FileOutputStream(dirToDownloadTo + "/" + url.substring(url.lastIndexOf('/') + 1))
 
-
-        if (successLogin) {
-            String filename = "neoGAA_Mapping_File.txt"
-            fos = new FileOutputStream(dirToDownloadTo + "/" + filename)
 
 
 //            boolean downloadingSuccess = client.retrieveFile(filename, fos)
-            boolean downloadingSuccess = client.retrieveFile("/Sergey_Aleshchenko/neoGAA_Mapping_File.txt", fos)
+                boolean downloadingSuccess = ftp.retrieveFile(aURL.getPath(), fos)
 
-            if (downloadingSuccess) println("File was successful downloaded from FTP server!")
-            fos.flush()
-            fos.close()
-            client.disconnect()
+                if (downloadingSuccess) {
+                    println("File was successful downloaded from FTP server!")
+                } else {
+                    throw new Exception("Error of file downloading!")
+                }
+                fos.flush()
+                fos.close()
+                ftp.disconnect()
+            }
         }
-
     }
 
 

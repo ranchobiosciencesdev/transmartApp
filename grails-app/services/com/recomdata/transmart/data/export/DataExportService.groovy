@@ -267,7 +267,8 @@ class DataExportService {
                         // get link and prepare output folder
                         String extFileId = match[0][1]
                         ExtData extData = ExtData.get(Long.parseLong(extFileId))
-                        File extStudyDir = new File(jobTmpDirectory, subset + "_" + (extData.study =~ ~/\\(\w+)\\$/)[0][1])
+//                        File extStudyDir = new File(jobTmpDirectory, subset + "_" + (extData.study =~ ~/\\(\w+)\\$/)[0][1])
+                        File extStudyDir = new File(jobTmpDirectory, subset + "_" + extData.study)
                         File extDir = new File(extStudyDir ,"external_" + extData.name.replaceAll(" ", "_").replaceAll("[^a-zA-Z0-9]", "") + "_" + extFileId)
                         extDir.mkdirs()
                         def printDataInfo = { writer ->
