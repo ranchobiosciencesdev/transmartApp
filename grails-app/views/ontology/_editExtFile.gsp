@@ -1,31 +1,7 @@
 <style type="text/css">
 .widthText {
-    width: 360px;
+    width: 341px;
 }
-/*input:required:invalid, input:focus:invalid {
-    border: 1px solid #b2d1ff;
-    background-image: url(${resource(dir: 'images', file: 'uncheck.png')});
-    background-position: right top;
-    background-repeat: no-repeat;
-}
-input:required:valid, input:focus:valid {
-    border: 1px solid #b2d1ff;
-    background-image: url(${resource(dir: 'images', file: 'check.png')});
-    background-position: right top;
-    background-repeat: no-repeat;
-}
-textarea:required:invalid, input:focus:invalid {
-    border: 1px solid #b2d1ff;
-    background-image: url(${resource(dir: 'images', file: 'uncheck.png')});
-    background-position: right top;
-    background-repeat: no-repeat;
-}
-textarea:required:valid, input:focus:valid {
-    border: 1px solid #b2d1ff;
-    background-image: url(${resource(dir: 'images', file: 'check.png')});
-    background-position: right top;
-    background-repeat: no-repeat;
-}*/
 .input-wrapper{
     position: relative;
 }

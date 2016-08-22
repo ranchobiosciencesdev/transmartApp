@@ -1,7 +1,7 @@
 
 <style type="text/css">
 .widthText {
-    width: 360px;
+    width: 341px;
 }
 .input-wrapper{
     position: relative;
