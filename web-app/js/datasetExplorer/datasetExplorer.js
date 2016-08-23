@@ -2481,37 +2481,43 @@ function exportDataFinished() {
 
 function runAllQueries(callback, panel) {
 
-    if (isSubsetEmpty(1) && isSubsetEmpty(2)) {
-        if (panel) {
-            panel.body.unmask();
+	if (isSubsetEmpty(1) && isSubsetEmpty(2)) {
+		if (panel) {
+			panel.body.unmask();
 		}
 		Ext.Msg.alert('Subsets are empty', 'All subsets are empty. Please select subsets.');
 	}
 
 	// setup the number of subsets that need running
 	var subsetstorun = 0;
-    for (var i = 1; i <= GLOBAL.NumOfSubsets; i++) {
-        if (!isSubsetEmpty(i)) {
+	for (var i = 1; i <= GLOBAL.NumOfSubsets; i++) {
+		if (!isSubsetEmpty(i)) {
 			subsetstorun ++ ;
 		}
 	}
 
-    /* set the number of requests before callback is fired for runquery complete */
+	/* set the number of requests before callback is fired for runquery complete */
 	STATE.QueryRequestCounter = subsetstorun;
 
-    // init panel's subset query array if it's not existing yet
-    if (panel) {
-        panel.subsetQueries = panel.subsetQueries ? panel.subsetQueries : ["", "", ""];
-    }
+	// init panel's subset query array if it's not existing yet
+	if (panel) {
+		panel.subsetQueries = panel.subsetQueries ? panel.subsetQueries : ["", "", ""];
+	}
+	var flag=false;
 	// iterate through all subsets calling the ones that need to be run
-    for (var i = 1; i <= GLOBAL.NumOfSubsets; i++) {
+	for (var i = 1; i <= GLOBAL.NumOfSubsets; i++) {
 
-        if (!isSubsetEmpty(i)) {
-            if (panel) {
-                panel.subsetQueries[i] = getSubsetQuery(i); // set subset queries to the selected tab
-            }
+		if (!isSubsetEmpty(i)) {
+			flag=true;
+			if (panel) {
+				panel.subsetQueries[i] = getSubsetQuery(i); // set subset queries to the selected tab
+			}
 			runQuery(i, callback);
 		}
+	}
+	if(!flag){
+		panel.hide();
+
 	}
 
 }

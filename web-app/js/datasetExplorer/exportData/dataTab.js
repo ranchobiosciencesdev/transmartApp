@@ -106,7 +106,6 @@ CustomGridPanel.prototype.dropZonesChecker = function () {
  * that can be exported.
  */
 function getDatadata() {
-
     // create new instance of data export
     var dataExport = new DataExport();
 
