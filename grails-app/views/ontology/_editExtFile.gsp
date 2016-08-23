@@ -2,6 +2,9 @@
 .widthText {
     width: 341px;
 }
+.widthTextArea {
+    width: 339px;
+}
 .input-wrapper{
     position: relative;
 }
@@ -36,7 +39,7 @@
 
     Description:<br/>
     <div class="input-wrapper">
-        <textarea id="description" class="widthText" name="description" rows="3" required >${file.description}</textarea>
+        <textarea id="description" class="widthTextArea" name="description" rows="3" required >${file.description}</textarea>
         <span class="validation-icon valid"></span>
     </div><br/>
     Link:<br/>
