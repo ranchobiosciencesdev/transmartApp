@@ -115,7 +115,8 @@ class ExternalDataService {
                             fileDownloadService.getFiles([extData.link], extDir.toString())
                             break;
                         case "ftp":
-                            externalFilesDownloadService.downloadFileFromFTPServer([extData.link], extDir.toString())
+//                            externalFilesDownloadService.downloadFileFromFTPServer([extData.link], extDir.toString())
+                            externalFilesDownloadService.downloadFileFromFTPServer(extData, extDir.toString())
                             break;
                         default:
                             new File(extDir, "ErrorLog.txt").withWriter("UTF-8") { writer ->
