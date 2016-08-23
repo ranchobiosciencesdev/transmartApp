@@ -26,8 +26,7 @@ class DataExportService {
     def vcfDataService
     def dataSource
 
-    def fileDownloadService
-    def externalFilesDownloadService
+    def externalDataService
 
     @Transactional(readOnly = true)
     def exportData(jobDataMap) {
@@ -58,6 +57,26 @@ class DataExportService {
                 throw new Exception('Job temp directory needs to be specified')
             }
         }
+
+        // export external data at first
+        def externalDataMap = [:]
+        subsets.each { subset ->
+            def selectedFilesList = subsetSelectedFilesMap.get(subset) ?: []
+            // remove duplicated data types
+            selectedFilesList.unique()
+            // fill list with externalDataMap
+            externalDataMap[subset] = []
+            selectedFilesList.each() { selectedFile ->
+                def match = selectedFile =~ ~/^extFile-(\d+)$/
+                if (match) {
+                    // get link and prepare output folder
+                    Long extFileId = Long.parseLong(match[0][1])
+                    externalDataMap[subset].add(extFileId)
+                }
+            }
+        }
+        // stat export of the external files
+        externalDataService.exportExternalData(externalDataMap, jobTmpDirectory)
 
         subsets.each { subset ->
             def columnFilter = selection[subset]?.clinical?.selector
@@ -256,53 +275,6 @@ class DataExportService {
                                     prefix = "S2"
                                 vcfDataService.getDataAsFile(outputDir, jobDataMap.get("jobName"), null, resultInstanceIdMap[subset], selectedSNPs, selectedGenes, chromosomes, prefix);
                                 break;
-                        }
-                    }
-                }
-
-                // export external data
-                selectedFilesList.each { selectedFile ->
-                    def match = selectedFile =~ ~/^extFile-(\d+)$/
-                    if (match) {
-                        // get link and prepare output folder
-                        String extFileId = match[0][1]
-                        ExtData extData = ExtData.get(Long.parseLong(extFileId))
-                        File extStudyDir = new File(jobTmpDirectory, subset + "_" + (extData.study =~ ~/\\(\w+)\\$/)[0][1])
-                        File extDir = new File(extStudyDir ,"external_" + extData.name.replaceAll(" ", "_").replaceAll("[^a-zA-Z0-9]", "") + "_" + extFileId)
-                        extDir.mkdirs()
-                        def printDataInfo = { writer ->
-                            writer.writeLine "Data node:  ${extData.pathnode}"
-                            writer.writeLine "Name: ${extData.name}"
-                            writer.writeLine "Data type: ${extData.dataType.name}"
-                            writer.writeLine "Link: ${extData.link}"
-                            writer.writeLine "Description: ${extData.description}"
-                        }
-                        try {
-                            String protocol = new URL(extData.link).protocol
-                            print "==========="
-                            switch (protocol) {
-                                case "http":
-                                case "https":
-                                    print "---"
-                                    fileDownloadService.getFiles([extData.link], extDir.toString())
-                                    break;
-                                case "ftp":
-                                    print "+++"
-                                    externalFilesDownloadService.downloadFileFromFTPServer([extData.link], extDir.toString())
-                                    break;
-                                default:
-                                    new File(extDir, "ErrorLog.txt").withWriter("UTF-8") {writer ->
-                                        writer.writeLine "Error. Unsupported protocol \"${protocol}\""
-                                        printDataInfo(writer)
-                                    }
-                                    break;
-                            }
-                        } catch (Exception e) {
-                            new File(extDir, "ErrorLog.txt").withWriter {writer ->
-                                writer.writeLine "Error. Exception \"${e}\""
-                                printDataInfo(writer)
-                                e.printStackTrace(new PrintWriter(writer))
-                            }
                         }
                     }
                 }

@@ -7,6 +7,7 @@ import org.transmartproject.core.exceptions.InvalidArgumentsException
 import org.transmartproject.core.ontology.Study
 import org.transmartproject.core.querytool.QueryDefinition
 import org.transmartproject.core.users.User
+import org.transmartproject.db.concept.ConceptKey
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -83,14 +84,14 @@ class DataExportController {
                             if (!panel.invert) {
                                 or {
                                     for (def item : panel.items) {
-                                        like("pathnode", conceptKeyToSqlLikeCondition(item.conceptKey))
+                                        like("pathNode", conceptKeyToSqlLikeCondition(item.conceptKey))
                                     }
                                 }
                             } else {
                                 not {
                                     or {
                                         for (def item : panel.items) {
-                                            like("pathnode", conceptKeyToSqlLikeCondition(item.conceptKey))
+                                            like("pathNode", conceptKeyToSqlLikeCondition(item.conceptKey))
                                         }
                                     }
                                 }
@@ -101,9 +102,10 @@ class DataExportController {
                 }
                 for (ExtData extData : results) {
                     if (!(extData.id in externalFiles)) {
+                        def studyPath = new ConceptKey(extData.studyConceptKey).conceptFullName.toString()
                         externalFiles[extData.id] = [
                                 "dataTypeId"  : "extFile-${extData.id}",
-                                "dataTypeName": "External ${extData.dataType.name} \"${extData.name}\" (${extData.study})",
+                                "dataTypeName": "External ${extData.dataType.name} \"${extData.name}\" (${studyPath})",
                                 "subset1"     : false,
                                 "subset2"     : false
                         ]

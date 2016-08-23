@@ -2180,6 +2180,8 @@ function saveChangesExtFile(conceptKey, conceptid, conceptcomment, fileId, oldna
 	var selectedType = document.getElementById("datatype");
 	var selectedValue = selectedType.options[selectedType.selectedIndex].value;
 	var link = document.getElementById("link").value;
+	var link_login = document.getElementById("link_login").value;
+	var link_password = document.getElementById("link_password").value;
 	if (filename == "") {
 		error = true;
 		errorMsg += "Field Name is empty!\n";
@@ -2207,7 +2209,9 @@ function saveChangesExtFile(conceptKey, conceptid, conceptcomment, fileId, oldna
 				desc: description,
 				link: link,
 				datatype_id: selectedValue,
-				oldName: oldname
+				oldName: oldname,
+				link_login: link_login,
+				link_password: link_password
 			},
 			callback: function() {
 				// we should wait answer before to show main window
@@ -2228,6 +2232,8 @@ function saveNewExtFile(conceptKey, conceptid, conceptcomment) {
 	var selectedType = document.getElementById("datatype");
 	var selectedValue = selectedType.options[selectedType.selectedIndex].value;
 	var link = document.getElementById("link").value;
+	var link_login = document.getElementById("link_login").value;
+	var link_password = document.getElementById("link_password").value;
 	if (filename == "") {
 		error = true;
 		errorMsg += "Field Name is empty!\n";
@@ -2253,7 +2259,9 @@ function saveNewExtFile(conceptKey, conceptid, conceptcomment) {
 				name: filename,
 				desc: description,
 				link: link,
-				datatype_id: selectedValue
+				datatype_id: selectedValue,
+				link_login: link_login,
+				link_password: link_password
 			},
 			callback: function() {
 				// we should wait answer before to show main window

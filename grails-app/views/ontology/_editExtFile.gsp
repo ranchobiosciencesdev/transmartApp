@@ -36,6 +36,10 @@ textarea:required:valid, input:focus:valid {
     <textarea id="description" class="widthText" name="description" rows="3" required >${file.description}</textarea><br/>
     Link:<br/>
     <input type="url" id="link" class="widthText" name="link" required value="${file.link}"/><br/>
+    Login<br/>
+    <input id="link_login" class="widthText" type="text" name="login" value="${file.login}"/><br>
+    Password<br/>
+    <input id="link_password" class="widthText" type="password" name="password" value="${file.password}"/><br>
     Datatype: <br/>
     <select id="datatype" style="width: 362px">
         <g:each in="${types}" var="type">

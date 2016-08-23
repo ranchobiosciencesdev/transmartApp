@@ -12,6 +12,7 @@ import org.transmartproject.core.ontology.ConceptsResource
 import org.transmartproject.core.ontology.OntologyTerm
 import org.transmartproject.core.ontology.StudiesResource
 import org.transmartproject.core.ontology.Study
+import org.transmartproject.db.concept.ConceptKey
 
 class OntologyController {
     def dataSource;
@@ -23,6 +24,7 @@ class OntologyController {
     def amTagItemService
     ConceptsResource conceptsResourceService
     StudiesResource studiesResourceService
+    def externalDataService
 
     def showOntTagFilter = {
         def tagtypesc = []
@@ -113,110 +115,77 @@ class OntologyController {
             AmTagTemplate amTagTemplate = amTagTemplateService.getTemplate(folder.uniqueId)
             List<AmTagItem> metaDataTagItems = amTagItemService.getDisplayItems(amTagTemplate?.id)
             render template: 'showStudy',
-                    model: [folder: folder,
-                            bioDataObject: experiment,
+                    model: [folder          : folder,
+                            bioDataObject   : experiment,
                             metaDataTagItems: metaDataTagItems]
         }
     }
 
     def showExtFiles = {
         OntologyTerm term = conceptsResourceService.getByKey(params.conceptKey)
-        def conceptKey = escapeJavascript(null,params.conceptKey)
-        def conceptid = escapeJavascript(null,params.conceptid)
-        def conceptcomment = escapeJavascript(null,params.conceptcomment)
-        def files = ExtData.findAllByStudy(term.fullName, [sort: "id", order: "asc"])
-        render template: 'showExtFiles', model: [study: term.fullName, files: files, conceptKey: conceptKey, conceptid: conceptid, conceptcomment: conceptcomment]
+        def conceptKey = escapeJavascript(null, params.conceptKey)
+        def conceptid = escapeJavascript(null, params.conceptid)
+        def conceptcomment = escapeJavascript(null, params.conceptcomment)
+        def files = externalDataService.getExtDataForStudy(params.conceptKey)
+        def manageAccess = externalDataService.hasManagePermission(params.conceptKey)
+        render template: 'showExtFiles', model: [study: term.fullName, files: files, conceptKey: conceptKey, conceptid: conceptid, conceptcomment: conceptcomment, manageAccess: manageAccess]
     }
 
     def editExtFile = {
-        def conceptKey = escapeJavascript(null,params.conceptKey)
-        def conceptid = escapeJavascript(null,params.conceptid)
-        def conceptcomment = escapeJavascript(null,params.conceptcomment)
-        OntologyTerm term = conceptsResourceService.getByKey(params.conceptKey)
+        def conceptKey = escapeJavascript(null, params.conceptKey)
+        def conceptid = escapeJavascript(null, params.conceptid)
+        def conceptcomment = escapeJavascript(null, params.conceptcomment)
+        def fullName = new ConceptKey(params.conceptKey).conceptFullName.toString()
         def types = ExtDataType.findAll()
         def fileId = params.fileId
-        def file = ExtData.get(params.fileId)
-        render template: 'editExtFile', model: [study : term.fullName, types : types, file: file, conceptKey : conceptKey, conceptid : conceptid, conceptcomment : conceptcomment]
+        def file = externalDataService.getExtData(Long.parseLong(fileId))
+        render template: 'editExtFile', model: [study: fullName, types: types, file: file, conceptKey: conceptKey, conceptid: conceptid, conceptcomment: conceptcomment]
     }
 
     def addExtFile = {
-        def conceptKey = escapeJavascript(null,params.conceptKey)
-        def conceptid = escapeJavascript(null,params.conceptid)
-        def conceptcomment = escapeJavascript(null,params.conceptcomment)
-        OntologyTerm term = conceptsResourceService.getByKey(params.conceptKey)
+        def conceptKey = escapeJavascript(null, params.conceptKey)
+        def conceptid = escapeJavascript(null, params.conceptid)
+        def conceptcomment = escapeJavascript(null, params.conceptcomment)
+        def fullName = new ConceptKey(params.conceptKey).conceptFullName
         def types = ExtDataType.findAll()
-        render template: 'addExtFile', model: [study : term.fullName, types : types, conceptKey : conceptKey, conceptid : conceptid, conceptcomment : conceptcomment]
+        render template: 'addExtFile', model: [study: fullName, types: types, conceptKey: conceptKey, conceptid: conceptid, conceptcomment: conceptcomment]
     }
 
     def deleteExtFile = {
-        def extDataFile = ExtData.get(params.id)
-        def fullname = extDataFile.study+extDataFile.name+' (ext)\\'
-        def jobID = null
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-        sql.call("{call TM_CZ.I2B2_DELETE_ALL_NODES($fullname,$jobID)}")
-        sql.close()
-        extDataFile.delete()
+        externalDataService.deleteExtData(Long.parseLong(params.id))
         // we must return something to prevent error 404
         render "Done"
     }
 
+    static String parseLogPas(String logPass) {
+        String t = logPass.trim()
+        return (t == "" ? null : t)
+    }
+
     def editExtFileDone = {
-        OntologyTerm term = conceptsResourceService.getByKey(params.conceptKey)
-        def path = term.fullName+params.name+' (ext)'+'\\'
-        def oldname = params.oldName;
-        def oldPath = term.fullName+oldname+' (ext)'
-        def trialID = term.study.id
-        def pathName =params.name+' (ext)'
-        def jobid=null
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-        sql.call("{call TM_CZ.I2B2_DELETE_ALL_NODES($oldPath,$jobid)}")
-        sql.call("{call TM_CZ.I2B2_ADD_NODE($trialID,$path,$pathName, $jobid)}")
-        def datatype = Integer.parseInt(params.datatype_id)
-        if(datatype==1) {
-            sql.executeUpdate("update i2b2metadata.i2b2 set C_VISUALATTRIBUTES='LA' where C_FULLNAME = $path")
-        } else {
-            sql.executeUpdate("update i2b2metadata.i2b2 set C_VISUALATTRIBUTES='LAH' where C_FULLNAME = $path")
-        }
-        sql.close()
-        def newData = ExtData.get(params.fileId)
-        newData.name=params.name
-        newData.description=params.desc
-        newData.link=params.link
-        newData.study=term.fullName
-        newData.dataType=ExtDataType.get(Integer.parseInt(params.datatype_id))
-        newData.pathnode=path
-        newData.save()
+        externalDataService.updateExtData(
+                Long.parseLong(params.fileId),
+                params.name,
+                params.desc,
+                ExtDataType.get(Long.parseLong(params.datatype_id)),
+                params.link,
+                parseLogPas(params.link_login),
+                parseLogPas(params.link_password),
+        )
         // we must return something to prevent error 404
         render "Done"
     }
 
     def addExtFileDone = {
-        print("ALARMDONE!"+params.conceptKey)
-        OntologyTerm term = conceptsResourceService.getByKey(params.conceptKey)
-        def path = term.fullName+params.name+' (ext)'+'\\'
-        def trialID = term.study.id
-        def pathName =params.name+' (ext)'
-        def jobid=null
-        groovy.sql.Sql sql = new groovy.sql.Sql(dataSource)
-        sql.call("{call TM_CZ.I2B2_ADD_NODE($trialID,$path,$pathName, $jobid)}")
-        def datatype = Integer.parseInt(params.datatype_id)
-        if(datatype==1) {
-            sql.executeUpdate("update i2b2metadata.i2b2 set C_VISUALATTRIBUTES='LA' where C_FULLNAME = $path")
-        } else {
-            sql.executeUpdate("update i2b2metadata.i2b2 set C_VISUALATTRIBUTES='LAH' where C_FULLNAME = $path")
-        }
-        sql.close()
-        def newData = new ExtData()
-        newData.name=params.name
-        newData.description=params.desc
-        newData.link=params.link
-        newData.study=term.fullName
-        newData.dataType=ExtDataType.get(Integer.parseInt(params.datatype_id))
-        newData.pathnode=path
-        newData.save()
-
-        print("SaveDONE!"+params.conceptKey)
-
+        externalDataService.addExtData(
+                params.conceptKey,
+                params.name,
+                params.desc,
+                ExtDataType.get(Long.parseLong(params.datatype_id)),
+                params.link,
+                parseLogPas(params.link_login),
+                parseLogPas(params.link_password),
+        )
         // we must return something to prevent error 404
         render "Done"
     }
