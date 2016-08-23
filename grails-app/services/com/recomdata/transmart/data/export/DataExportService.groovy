@@ -3,7 +3,6 @@ package com.recomdata.transmart.data.export
 import com.google.common.base.CharMatcher
 import com.recomdata.snp.SnpData
 import com.recomdata.transmart.data.export.exception.DataNotFoundException
-import com.recomdata.transmart.domain.i2b2.ExtData
 import groovy.json.JsonSlurper
 import groovy.sql.Sql
 import org.apache.commons.lang.StringUtils

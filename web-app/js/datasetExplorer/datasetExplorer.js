@@ -2133,7 +2133,7 @@ function editBtnHandler(conceptKey, conceptid, conceptcomment, fileId){
 		nocache: true,
 		text: "Loading...",
 		timeout: 30000,
-		scripts: false
+		scripts: true
 	});
 }
 
@@ -2168,7 +2168,7 @@ function addBtnHandler (conceptKey, conceptid, conceptcomment){
 		nocache: true,
 		text: "Loading...",
 		timeout: 30000,
-		scripts: false
+		scripts: true
 	});
 }
 
