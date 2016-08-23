@@ -48,12 +48,12 @@
     Login<br/>
     <div class="input-wrapper">
         <input id="link_login" class="widthText" type="text" name="login"/><br>
-        <span class="validation-icon"></span>
+        <span class="validation-icon valid"></span>
     </div><br/>
     Password<br/>
     <div class="input-wrapper">
         <input id="link_password" class="widthText" type="password" name="password"/><br>
-        <span class="validation-icon"></span>
+        <span class="validation-icon valid"></span>
     </div><br/>
     Datatype: <br/>
     <select id="datatype" style="width: 362px">
