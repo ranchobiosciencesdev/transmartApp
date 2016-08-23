@@ -576,11 +576,14 @@ Ext.onReady(function () {
 					layout : 'fit',
                 listeners: {
 						activate : function(p) {
+
                         if (isSubsetQueriesChanged(p.subsetQueries) || !Ext.get('dataTypesGridPanel')) {
+							//alert (isSubsetQueriesChanged(p.subsetQueries) +' '+ !Ext.get('dataTypesGridPanel'));
 							p.body.mask("Loading...", 'x-mask-loading');
 							runAllQueries(getDatadata, p);
 			        	 	return;
                         }
+
 						},
                     'afterLayout': {
                         fn: function (el) {
@@ -2110,8 +2113,8 @@ function editBtnHandler(conceptKey, conceptid, conceptcomment, fileId){
 			{
 				id : 'editExtFile',
 				layout : 'fit',
-				width : 400,
-				height : 400,
+				width : 420,
+				height : 500,
 				closable : false,
 				plain : true,
 				modal : true,
@@ -2144,8 +2147,8 @@ function addBtnHandler (conceptKey, conceptid, conceptcomment){
 			{
 				id : 'addExtFile',
 				layout : 'fit',
-				width : 400,
-				height : 400,
+				width : 420,
+				height : 500,
 				closable : false,
 				plain : true,
 				modal : true,
@@ -2500,9 +2503,9 @@ function runAllQueries(callback, panel) {
     if (panel) {
         panel.subsetQueries = panel.subsetQueries ? panel.subsetQueries : ["", "", ""];
     }
-
 	// iterate through all subsets calling the ones that need to be run
     for (var i = 1; i <= GLOBAL.NumOfSubsets; i++) {
+
         if (!isSubsetEmpty(i)) {
             if (panel) {
                 panel.subsetQueries[i] = getSubsetQuery(i); // set subset queries to the selected tab
@@ -2510,6 +2513,7 @@ function runAllQueries(callback, panel) {
 			runQuery(i, callback);
 		}
 	}
+
 }
 
 

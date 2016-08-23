@@ -14,7 +14,7 @@
     display: block;
     position: absolute;
     top:2px;
-    right: 16px;
+    right: 25px;
     z-index: 10;
     width: 16px;
     height: 16px;
