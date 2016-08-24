@@ -1,8 +1,6 @@
 package com.recomdata.transmart.util
 import com.recomdata.transmart.domain.i2b2.ExtData
-import org.apache.commons.net.ftp.FTP
 import org.apache.commons.net.ftp.FTPClient
-import org.transmartproject.db.ontology.I2b2
 /**
  * Created by transmart on 8/8/16.
  */
@@ -67,7 +65,8 @@ class ExternalFilesDownloadService {
         if (successLogin) {
             String filename = aURL.getFile()
             fos = new FileOutputStream(dirToDownloadTo + "/" + url.substring(url.lastIndexOf('/') + 1))
-            ftp.setFileType(FTP.BINARY_FILE_TYPE)
+//            ftp.setFileType(FTP.BINARY_FILE_TYPE)
+            ftp.enterLocalPassiveMode()
             boolean downloadingSuccess = ftp.retrieveFile(aURL.getPath(), fos)
 
             if (downloadingSuccess) {
