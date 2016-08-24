@@ -2498,7 +2498,7 @@ function runAllQueries(callback, panel) {
 
 	/* set the number of requests before callback is fired for runquery complete */
 	STATE.QueryRequestCounter = subsetstorun;
-
+	panel.subsetQueries=null;
 	// init panel's subset query array if it's not existing yet
 	if (panel) {
 		panel.subsetQueries = panel.subsetQueries ? panel.subsetQueries : ["", "", ""];
@@ -2516,6 +2516,7 @@ function runAllQueries(callback, panel) {
 		}
 	}
 	if(!flag){
+		panel.subsetQueries = ["", "", ""];
 		panel.hide();
 
 	}

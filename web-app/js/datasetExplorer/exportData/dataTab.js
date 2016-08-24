@@ -345,6 +345,7 @@ DataExport.prototype.prepareOutString = function (file, subset, dataTypeId) {
  * @returns {string|*}
  */
 DataExport.prototype.createSelectBoxHtml = function (file, subset, dataTypeId) {
+
     outStr = '';
     outStr +=  '<strong>' + file.patientsNumber + '</strong> patient' + (file.patientsNumber > 1 ? 's' : '');
     //TODO Show simple label if there is just one file format possible
@@ -423,12 +424,14 @@ DataExport.prototype.prepareNewStore = function (store, columns, selectedCohortD
         return " <br><span class='data-export-filter-tip'>(Drag and drop " + _str_data_type
             + " nodes here to filter the exported data.)</span>";
     }
+    // remove old checkboxes from previous export
+    var temp = document.getElementsByName("download_dt");
+    while (temp.length) temp[0].parentNode.removeChild(temp[0]);
 
     store.each(function (row) {
         var this_data = [];
         this_data['dataTypeId'] = row.data.dataTypeId;
         this_data['dataTypeName'] = row.data.dataTypeName + _get_export_data_tip (row.data.subset1);
-
         var outStr = _this.prepareOutString(row.data.subset1, row.data.subsetId1, row.data.dataTypeId);
         this_data[row.data.subsetId1] = outStr;
 
@@ -606,6 +609,7 @@ DataExport.prototype.runDataExportJob = function (result, gridPanel) {
     var selectedSubsetDataTypeFiles = [];
 
     for (var i = 0; i < subsetDataTypeFiles.length; i++) {
+
         var selectedVal = jQuery("select[id=file_type_" + subsetDataTypeFiles[i].id + "] option:selected").val();
         selectedSubsetDataTypeFiles.push(selectedVal);
     }
