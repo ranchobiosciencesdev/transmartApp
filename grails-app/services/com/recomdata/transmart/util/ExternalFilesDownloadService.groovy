@@ -1,5 +1,6 @@
 package com.recomdata.transmart.util
 import com.recomdata.transmart.domain.i2b2.ExtData
+import org.apache.commons.net.ftp.FTP
 import org.apache.commons.net.ftp.FTPClient
 import org.transmartproject.db.ontology.I2b2
 /**
@@ -33,6 +34,7 @@ class ExternalFilesDownloadService {
 
                 if (successLogin) {
                     println("FTP server - successful login!")
+                    ftp.setFileType(FTP.BINARY_FILE_TYPE)
                     break
                 } else {
                     println("FTP server - login denied")
@@ -54,6 +56,7 @@ class ExternalFilesDownloadService {
 
                 if (successLogin) {
                     println("FTP server - successful login!")
+                    ftp.setFileType(FTP.BINARY_FILE_TYPE)
                     break
                 } else {
                     println("FTP server - login denied")
