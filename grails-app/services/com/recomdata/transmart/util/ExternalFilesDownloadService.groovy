@@ -34,7 +34,6 @@ class ExternalFilesDownloadService {
 
                 if (successLogin) {
                     println("FTP server - successful login!")
-                    ftp.setFileType(FTP.BINARY_FILE_TYPE)
                     break
                 } else {
                     println("FTP server - login denied")
@@ -56,7 +55,6 @@ class ExternalFilesDownloadService {
 
                 if (successLogin) {
                     println("FTP server - successful login!")
-                    ftp.setFileType(FTP.BINARY_FILE_TYPE)
                     break
                 } else {
                     println("FTP server - login denied")
@@ -69,6 +67,7 @@ class ExternalFilesDownloadService {
         if (successLogin) {
             String filename = aURL.getFile()
             fos = new FileOutputStream(dirToDownloadTo + "/" + url.substring(url.lastIndexOf('/') + 1))
+            ftp.setFileType(FTP.BINARY_FILE_TYPE)
             boolean downloadingSuccess = ftp.retrieveFile(aURL.getPath(), fos)
 
             if (downloadingSuccess) {
