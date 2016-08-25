@@ -47,6 +47,8 @@
         <input type="url" id="link" class="widthText" name="link" required value="${file.link}"/>
         <span class="validation-icon valid"></span>
     </div><br/>
+    <input style="display:none" type="text" name="login"/>
+    <input style="display:none" type="password" name="fakepasswordremembered"/>
     Login<br/>
     <div class="input-wrapper">
         <input id="link_login" class="widthText" type="text" name="login" value="${file.login}"/><br>

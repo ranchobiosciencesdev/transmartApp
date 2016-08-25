@@ -2173,6 +2173,8 @@ function addBtnHandler (conceptKey, conceptid, conceptcomment){
 		timeout: 30000,
 		scripts: true
 	});
+
+
 }
 
 function saveChangesExtFile(conceptKey, conceptid, conceptcomment, fileId, oldname) {

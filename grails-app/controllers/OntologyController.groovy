@@ -148,7 +148,8 @@ class OntologyController {
         def conceptcomment = escapeJavascript(null, params.conceptcomment)
         def fullName = new ConceptKey(params.conceptKey).conceptFullName
         def types = ExtDataType.findAll()
-        render template: 'addExtFile', model: [study: fullName, types: types, conceptKey: conceptKey, conceptid: conceptid, conceptcomment: conceptcomment]
+        def login ='';
+        render template: 'addExtFile', model: [study: fullName, types: types, log:login, conceptKey: conceptKey, conceptid: conceptid, conceptcomment: conceptcomment]
     }
 
     def deleteExtFile = {

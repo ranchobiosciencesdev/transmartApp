@@ -48,15 +48,17 @@
         <input type="url" id="link" class="widthText" name="link" required />
         <span class="validation-icon"></span>
     </div><br/>
+    <input style="display:none" type="text" name="login"/>
+    <input style="display:none" type="password" name="fakepasswordremembered"/>
     Login<br/>
     <div class="input-wrapper">
-        <input id="link_login" class="widthText" type="text" name="login"/><br>
-        <span class="validation-icon valid"></span>
+        <input id="link_login" autocomplete="off" class="widthText" type="text" name="login" value="${log}"/><br>
+        <span class="validation-icon"></span>
     </div><br/>
     Password<br/>
     <div class="input-wrapper">
-        <input id="link_password" class="widthText" type="password" name="password"/><br>
-        <span class="validation-icon valid"></span>
+        <input id="link_password" autocomplete="off" class="widthText" type="password" name="password" value="${log}"/><br>
+        <span class="validation-icon"></span>
     </div><br/>
     Datatype: <br/>
     <select id="datatype" style="width: 362px">
@@ -69,6 +71,11 @@
 <br/>
 <button onclick="saveNewExtFile('${conceptKey}','${conceptid}','${conceptcomment}')">Save</button><button onclick="addwin.hide();showManageExtDialog('${conceptKey}','${conceptid}','${conceptcomment}');">Cancel</button>
 <script>
+
+    /*document.getElementById("link_login").reset();
+    input.value='';
+    input = document.getElementById("link_password");
+    input.value='';*/
 
     var wrapper = null, i = 0;
     var wrappersCollection = document.getElementsByClassName('input-wrapper');
@@ -99,4 +106,5 @@
             }
         });
     }
+
 </script>
