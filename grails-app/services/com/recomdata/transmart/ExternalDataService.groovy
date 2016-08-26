@@ -165,7 +165,7 @@ class ExternalDataService {
         Sql sql = new Sql(dataSource)
         try {
             sql.call("{call TM_CZ.I2B2_ADD_NODE($trialId, $extData.pathNode, $extData.pathNodeName, null)}")
-            if (dataType.name.compareToIgnoreCase("Clinical Data")) {
+            if (dataType.name.equalsIgnoreCase("Clinical Data")) {
                 sql.executeUpdate("update i2b2metadata.i2b2 set C_VISUALATTRIBUTES='LA' where C_FULLNAME = $extData.pathNode")
             } else {
                 sql.executeUpdate("update i2b2metadata.i2b2 set C_VISUALATTRIBUTES='LAH' where C_FULLNAME = $extData.pathNode")
@@ -223,7 +223,7 @@ class ExternalDataService {
         try {
             sql.call("{call TM_CZ.I2B2_DELETE_ALL_NODES($oldNodePath, null)}")
             sql.call("{call TM_CZ.I2B2_ADD_NODE($trialId, $extData.pathNode, $extData.pathNodeName, null)}")
-            if (dataType.name.compareToIgnoreCase("Clinical Data")) {
+            if (dataType.name.equalsIgnoreCase("Clinical Data")) {
                 sql.executeUpdate("update i2b2metadata.i2b2 set C_VISUALATTRIBUTES='LA' where C_FULLNAME = $extData.pathNode")
             } else {
                 sql.executeUpdate("update i2b2metadata.i2b2 set C_VISUALATTRIBUTES='LAH' where C_FULLNAME = $extData.pathNode")
