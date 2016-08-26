@@ -52,12 +52,10 @@
     Login<br/>
     <div class="input-wrapper">
         <input id="link_login" class="widthText" type="text" name="login" value="${file.login}"/><br>
-        <span class="validation-icon valid"></span>
     </div><br/>
     Password<br/>
     <div class="input-wrapper">
         <input id="link_password" class="widthText" type="password" name="password" value="${file.password}"/><br>
-        <span class="validation-icon valid"></span>
     </div><br/>
     Datatype: <br/>
     <select id="datatype" style="width: 362px">

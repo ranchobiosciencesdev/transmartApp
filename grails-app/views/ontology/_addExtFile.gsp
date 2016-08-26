@@ -53,12 +53,10 @@
     Login<br/>
     <div class="input-wrapper">
         <input id="link_login" autocomplete="off" class="widthText" type="text" name="login" value="${log}"/><br>
-        <span class="validation-icon"></span>
     </div><br/>
     Password<br/>
     <div class="input-wrapper">
         <input id="link_password" autocomplete="off" class="widthText" type="password" name="password" value="${log}"/><br>
-        <span class="validation-icon"></span>
     </div><br/>
     Datatype: <br/>
     <select id="datatype" style="width: 362px">
