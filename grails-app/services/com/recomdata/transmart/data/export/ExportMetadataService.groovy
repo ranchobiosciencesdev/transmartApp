@@ -38,7 +38,11 @@ class ExportMetadataService {
         metadata.exportMetaData.addAll(
                 getLegacyHighDimensionMetaData(resultInstanceId1, resultInstanceId2)
         )
-
+        if(metadata.size()==1){
+            if(metadata.get("exportMetaData")[0].get("subset1").getAt("patientsNumber")==0 && metadata.get("exportMetaData")[0].get("subset2").getAt("patientsNumber")==0) {
+                metadata.exportMetaData.clear();
+            }
+        }
         metadata
     }
 

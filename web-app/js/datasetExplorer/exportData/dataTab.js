@@ -108,7 +108,6 @@ CustomGridPanel.prototype.dropZonesChecker = function () {
 function getDatadata() {
     // create new instance of data export
     var dataExport = new DataExport();
-
     // load export metadata
     dataExport.exportMetaDataStore.load({
         params: {result_instance_id1: GLOBAL.CurrentSubsetIDs[1], result_instance_id2: GLOBAL.CurrentSubsetIDs[2],
@@ -155,6 +154,7 @@ var DataExport = function() {
                 exportListFetchErrorHandler(response.status, responseText);
             }
         });
+
         return ret;
     }
 
@@ -179,7 +179,6 @@ DataExport.prototype.displayResult = function (records, options, success) {
     var _this = this;
 
     _this.records = records;
-
     /**
      * Get tool bar component
      * @returns {Ext.Toolbar}
@@ -261,10 +260,8 @@ DataExport.prototype.displayResult = function (records, options, success) {
         _selectedCohortData['dataTypeName'] = 'Selected Cohort';
         _selectedCohortData['subset1'] = getQuerySummary(1);
         _selectedCohortData['subset2'] = getQuerySummary(2);
-
         var _columns = _this.prepareColumnModel(_this.exportMetaDataStore, _selectedCohortData);
         var _newStore = _this.prepareNewStore(_this.exportMetaDataStore, _columns, _selectedCohortData);
-
         var _dataTypesGridPanel = _getDataTypesGridPanel(_newStore, _columns);
 
         _dataTypesGridPanel.records = _this.records;
@@ -410,6 +407,7 @@ DataExport.prototype.prepareNewStore = function (store, columns, selectedCohortD
      * @private
      */
     var _get_export_data_tip = function (file) {
+
         var _str_data_type = 'low dimensional';
 
         if (file.ontologyTermKeys) {
@@ -427,7 +425,6 @@ DataExport.prototype.prepareNewStore = function (store, columns, selectedCohortD
     // remove old checkboxes from previous export
     var temp = document.getElementsByName("download_dt");
     while (temp.length) temp[0].parentNode.removeChild(temp[0]);
-
     store.each(function (row) {
         var this_data = [];
         this_data['dataTypeId'] = row.data.dataTypeId;

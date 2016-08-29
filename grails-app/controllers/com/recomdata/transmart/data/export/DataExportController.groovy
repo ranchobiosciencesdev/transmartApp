@@ -116,6 +116,7 @@ class DataExportController {
         }
         // add information about external data to checkboxes
         for (Map externalFile : externalFiles.values().sort { a, b -> a["dataTypeName"].compareToIgnoreCase(b["dataTypeName"]) }) {
+
             result["exportMetaData"].add(generateExternalDataRecord(
                     externalFile["dataTypeId"],
                     externalFile["dataTypeName"],
