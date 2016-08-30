@@ -13,6 +13,7 @@ import org.transmartproject.db.concept.ConceptKey
 
 import javax.annotation.Resource
 import javax.sql.DataSource
+import java.lang.reflect.UndeclaredThrowableException
 
 import static org.transmartproject.core.users.ProtectedOperation.WellKnownOperations.EXPORT
 
@@ -116,7 +117,14 @@ class ExternalDataService {
                             break;
                         case "ftp":
 //                            externalFilesDownloadService.downloadFileFromFTPServer([extData.link], extDir.toString())
-                            externalFilesDownloadService.downloadFileFromFTPServer(extData, extDir.toString())
+                            def flag = externalFilesDownloadService.downloadFileFromFTPServer(extData, extDir.toString())
+                            if(!flag){
+                                new File(extDir, "ErrorLog.txt").withWriter { writer ->
+                                    writer.writeLine "Error. Authorised Exception: The password is incorrect. Exception"
+                                    printDataInfo(writer)
+
+                                }
+                            }
                             break;
                         default:
                             new File(extDir, "ErrorLog.txt").withWriter("UTF-8") { writer ->
@@ -125,7 +133,14 @@ class ExternalDataService {
                             }
                             break;
                     }
-                } catch (Exception e) {
+                }catch(UndeclaredThrowableException ex) {
+                    new File(extDir, "ErrorLog.txt").withWriter { writer ->
+                        writer.writeLine "Error. Authorised Exception: The password is incorrect. "
+                        printDataInfo(writer)
+                    }
+                }
+
+                catch (Exception e) {
                     new File(extDir, "ErrorLog.txt").withWriter { writer ->
                         writer.writeLine "Error. Exception \"${e}\""
                         printDataInfo(writer)

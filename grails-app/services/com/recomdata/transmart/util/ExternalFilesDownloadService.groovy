@@ -1,11 +1,14 @@
 package com.recomdata.transmart.util
 import com.recomdata.transmart.domain.i2b2.ExtData
 import org.apache.commons.net.ftp.FTPClient
+
+import java.lang.reflect.UndeclaredThrowableException
+
 /**
  * Created by transmart on 8/8/16.
  */
 class ExternalFilesDownloadService {
-    def downloadFileFromFTPServer(ExtData extData, String dirToDownloadTo) {
+    def downloadFileFromFTPServer(ExtData extData, String dirToDownloadTo)  {
         String url = extData.link;
         URL aURL = new URL(url)
         String server = aURL.getHost()
@@ -36,7 +39,10 @@ class ExternalFilesDownloadService {
                 } else {
                     println("FTP server - login denied")
                     connectingAttempts++
-                    if (connectingAttempts > 3) break
+                    if (connectingAttempts > 3) {
+                        return false;
+                        break;
+                    }
                 }
 
             }
@@ -53,11 +59,14 @@ class ExternalFilesDownloadService {
 
                 if (successLogin) {
                     println("FTP server - successful login!")
+                    //return true;
                     break
                 } else {
                     println("FTP server - login denied")
                     connectingAttempts++
-                    if (connectingAttempts > 3) break
+                    if (connectingAttempts > 3) {
+                       return false;
+                        break}
                 }
             }
         }
@@ -77,6 +86,7 @@ class ExternalFilesDownloadService {
             fos.flush()
             fos.close()
             ftp.disconnect()
+            return true;
         }
     }
 }
