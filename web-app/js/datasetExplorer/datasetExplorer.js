@@ -585,6 +585,11 @@ Ext.onReady(function () {
                         }
 
 						},
+
+					show : function(p){
+						onWindowResize();
+					},
+
                     'afterLayout': {
                         fn: function (el) {
                             onWindowResize();
