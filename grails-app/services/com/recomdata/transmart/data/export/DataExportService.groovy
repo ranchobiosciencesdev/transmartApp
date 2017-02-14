@@ -97,8 +97,8 @@ class DataExportService {
                         def List gplIds = subsetSelectedPlatformsByFiles?.get(subset)?.get(selectedFile)
                         def retVal = null
                         switch (selectedFile) {
-                            case 'CLINICAL':
-                                /*clinicalExportService.exportClinicalData(jobName: jobDataMap.jobName,
+                            /*case 'CLINICAL':
+                                clinicalExportService.exportClinicalData(jobName: jobDataMap.jobName,
                                         resultInstanceId: resultInstanceIdMap[subset],
                                         conceptKeys: selection[subset][selectedFile.toLowerCase()].selector,
                                         studyDir: studyDir
