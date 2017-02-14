@@ -65,6 +65,12 @@ class DataExportService {
             def snpFilesMap = [:]
             def selectedFilesList = subsetSelectedFilesMap.get(subset) ?: []
 
+             // Add all High Dimensional data types available, to the list
+            selectedFilesList?.addAll((selection[subset]?.keySet() ?: []) - ['clinical'])
+
+            // remove duplicated data types
+            selectedFilesList.unique()
+
             if (null != selectedFilesList && !selectedFilesList.isEmpty()) {
                 //Prepare Study dir
                 def List studyList = null
