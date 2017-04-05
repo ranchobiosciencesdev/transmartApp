@@ -88,6 +88,7 @@ grails.project.dependency.resolution = {
         // spring security version should be in sync with that brought with
         // grails-spring-security-core
         runtime 'org.springframework.security:spring-security-config:3.2.3.RELEASE',
+                'org.springframework.security:spring-security-core:3.2.3.RELEASE',
                 'org.springframework.security:spring-security-web:3.2.3.RELEASE', {
             transitive = false
         }

@@ -30,7 +30,7 @@ public class LdapAuthUserDetailsMapper implements UserDetailsContextMapper {
     //def loginAttemptCacheService
     //def conf = SpringSecurityUtils.securityConfig
     String mappedUsernameProperty = 'username' // also "federatedId" allowed
-    boolean inheritPassword = false
+    boolean inheritPassword = true
     // Pattern for newly created username generation, ignored if mappedUsernameProperty == 'username'
     String newUsernamePattern
     // List of roles assigned to new user
