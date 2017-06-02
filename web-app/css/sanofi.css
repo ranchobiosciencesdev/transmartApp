@@ -1,7 +1,7 @@
 /** For CSS shared between the browse view and reskinned Dataset Explorer. **/
 
 body {
-	font: 13px 'Helvetica',arial,clean,sans-serif	
+	font: 13px 'Georgia',arial,clean,sans-serif	
 }
 
 table.menuDetail th.menuBar{
@@ -13,23 +13,24 @@ table.menuDetail th.menuBar{
 
 table.menuDetail th.menuLink a:link, th.menuLink a:visited {
     font-size: 11px;
-    color: #515BA2 !important; /* Sorry */
+    font-family: Georgia,verdana,arial !important;
+    color: #f77e03 !important; /* Sorry */
 }
 
 .rdc-h2 {
-    color: #515BA2;
+    color: #f77e03;
     font-size: 174%;
     margin: 20px 0;
 }
 
 .rdc-h3 {
-    color: #515BA2;
+    color: #f77e03;
     font-size: 152%;
     margin: 10px 0;
 }
 
 .rdc-h4 {
-    color: #515BA2;
+    color: #f77e03;
     font-size: 129%;
     margin: 10px 0;
 }
@@ -57,7 +58,7 @@ table.menuDetail {
 }
 
 table.menuDetail th.menuBar {
-   	font-family: verdana, arial, helvetica, sans-serif;
+   	font-family: georgia, verdana, arial, helvetica, sans-serif;
     font-size: 11px;     
 	line-height: 15px;
     vertical-align: middle;
@@ -90,7 +91,7 @@ table.menuDetail th.menuLink a:hover {
 
 table.menuDetail th.menuVisited {
 	padding: 1px 15px;
-    color: #ADAEB6;
+    color: #7f8087;
     font-size: 10pt;
     font-weight: bold;
     background: none;
@@ -374,7 +375,7 @@ table.menuDetail th.menuVisited {
 	border:none;
 	background:none;
 	background-image: none;
-	background-color: #515BA2;
+	background-color: #f77e03;
 	font-family: 'Helvetica',arial,clean,sans-serif;
 }
 
