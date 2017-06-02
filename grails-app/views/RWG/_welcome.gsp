@@ -5,18 +5,23 @@
         <g:set var="projectLogo" value="${grailsApplication.config?.com?.recomdata?.projectLogo}"/>
         <g:set var="providerName" value="${grailsApplication.config?.com?.recomdata?.providerName}"/>
         <g:set var="providerLogo" value="${grailsApplication.config?.com?.recomdata?.providerLogo}"/>
-        <p><b>Welcome to tranSMART <g:if test="${projectName}">for ${projectName}</g:if></b></p>
+	<p>&nbsp;</p>
+	<p><a href="https://www.michaeljfox.org/"><img src="https://www.michaeljfox.org/images/hp_images/rfi-util-logo.gif" alt="MJFF Logo"></a></p>
+        <p><b>Welcome to MJFF tranSMART <g:if test="${projectName}">for ${projectName}</g:if></b></p><br>
 
         <p>The <b>Browse</b> window lets you search and dive into the information contained in tranSMART,
         including Programs, Studies, Assays and the associated Analyses Results, Subject Level Data and Raw Files.
         This is also the location to export files stored in tranSMART. Note: to edit the Program, Study, or Assay
         information, you must be logged in as an Administrator.
-        </p>
+        </p><br>
 
         <p>The <b>Analyze</b> window lets you perform a number of analyses either on studies selected
         in the Browse window, or from the global search box located in the top ribbon of your screen.
         More information about the analyses you can perform is available in the “Help" section of the "Utilities" menu.
-        </p>
+        </p><br>
+        <p>For questions or issues with this tranSMART instance please <a href="mailto:leonya@ranchobiosciences.com">click here</a></p>
+	<br><br>
+        <p>powered by <a href="http://www.ranchobiosciences.com"><img src="http://www.ranchobiosciences.com/wp-content/uploads/2016/01/Rancho.png" height="25" alt="Rancho BioSciences"></a></p>
         <br><br>
 
         <div>
