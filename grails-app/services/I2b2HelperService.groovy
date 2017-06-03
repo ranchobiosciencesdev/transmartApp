@@ -1224,7 +1224,7 @@ class I2b2HelperService {
          */
         String columnid = concept_key.encodeAsSHA1()
         String columnname = getColumnNameFromKey(concept_key).replace(" ", "_")
-        String columntooltip = keyToPath(concept_key).replaceAll('[^a-zA-Z0-9_\\-\\\\]+','_')
+        String columntooltip = keyToPath(concept_key).replaceAll('[^a-zA-Z0-9_()\\-\\\\]+','_')
 
 
         if (leafConceptFlag) {
@@ -1242,7 +1242,9 @@ class I2b2HelperService {
                 tablein.putColumn("subject", new ExportColumn("subject", "Subject", "", "string"));
             }
                 if (tablein.getColumn(columnid) == null) {
-                tablein.putColumn(columnid, new ExportColumn(columnid, columnname, "", columnType,columntooltip));
+                    tablein.putColumn(columnid, new ExportColumn(columnid,
+                            (columntooltip.contains("\\") ? columntooltip : columnname),
+                            "", columnType,columntooltip));
                 }
 
             if (xTrialsCaseFlag) {
@@ -1288,7 +1290,9 @@ class I2b2HelperService {
                 tablein.putColumn("subject", new ExportColumn("subject", "Subject", "", "string"));
             }
             if (tablein.getColumn(columnid) == null) {
-                tablein.putColumn(columnid, new ExportColumn(columnid, columnname, "", columnType,columntooltip));
+                tablein.putColumn(columnid, new ExportColumn(columnid,
+                        (columntooltip.contains("\\") ? columntooltip : columnname),
+                        "", columnType,columntooltip));
             }
 
             if (xTrialsCaseFlag) {

@@ -48,7 +48,12 @@ public class ExportColumn {
         return json;
     }
 
-    public JSONObject toJSON_DataTables() throws JSONException {
+    @Deprecated
+    public JSONObject toJSON_DataTables() throws JSONException { // renamed with smallCamelCase
+        return toJSONDataTables();
+    }
+
+    public JSONObject toJSONDataTables() throws JSONException {
         JSONObject json = new JSONObject();
         json.put("sTitle", label);
 
