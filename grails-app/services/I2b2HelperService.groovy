@@ -1256,7 +1256,9 @@ class I2b2HelperService {
             hascol = tablein.getColumnByBasename(columnname); // check existing column with basename
 
             if (tablein.getColumn(columnid) == null) {
-                tablein.putColumn(columnid, new ExportColumn(columnid, columnname, "", columnType,columntooltip));
+                tablein.putColumn(columnid, new ExportColumn(columnid,
+                        (columntooltip.contains("\\") ? columntooltip : columnname),
+                        "", columnType,columntooltip));
                 if(hascol)
                     tablein.setColumnUnique(columnid); // make labels unique
             }
@@ -1304,7 +1306,9 @@ class I2b2HelperService {
                 tablein.putColumn("subject", new ExportColumn("subject", "Subject", "", "string"));
             }
             if (tablein.getColumn(columnid) == null) {
-                tablein.putColumn(columnid, new ExportColumn(columnid, columnname, "", columnType,columntooltip));
+                tablein.putColumn(columnid, new ExportColumn(columnid,
+                        (columntooltip.contains("\\") ? columntooltip : columnname),
+                        "", columnType,columntooltip));
             }
 
             if (xTrialsCaseFlag) {

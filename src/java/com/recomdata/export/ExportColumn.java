@@ -51,7 +51,12 @@ public class ExportColumn {
         return json;
     }
 
+    @Deprecated
     public JSONObject toJSON_DataTables() throws JSONException {
+        return toJSONDataTables();
+    }
+
+    public JSONObject toJSONDataTables() throws JSONException {
         JSONObject json = new JSONObject();
         json.put("sTitle", label);
 

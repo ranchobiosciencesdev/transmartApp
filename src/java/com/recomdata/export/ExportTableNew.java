@@ -173,7 +173,7 @@ public class ExportTableNew {
 
         for (Iterator<ExportColumn> i = columns.values().iterator(); i.hasNext(); ) {
             ExportColumn col = i.next();
-            aoColumns.put(col.toJSON_DataTables());
+            aoColumns.put(col.toJSONDataTables());
             headerToolTips.put(col.getId());
         }
 
@@ -200,7 +200,7 @@ public class ExportTableNew {
         JSONArray columnsAry = new JSONArray();
 
         for (Iterator<ExportColumn> i = columns.values().iterator(); i.hasNext(); ) {
-            columnsAry.put(i.next().toJSON_DataTables());
+            columnsAry.put(i.next().toJSONDataTables());
         }
 
         jsonColumns.put("aoColumns", columnsAry);
